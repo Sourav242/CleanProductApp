@@ -446,7 +446,8 @@ fun ProductDetails(
 			Column(modifier = Modifier.padding(all = 16.dp)) {
 				Text(
 					text = product.title,
-					fontSize = 16.sp
+					fontSize = 16.sp,
+					color = MaterialTheme.colorScheme.inverseSurface
 				)
 				Text(text = product.description)
 
