@@ -12,12 +12,12 @@ interface ConnectivityObserver {
 
 	sealed class Status(
 		val status: Boolean,
-		val networkStatus: String
+		val networkStatus: String? = null
 	) {
 		object Available : Status(true, "Available")
 		object Unavailable : Status(false, "Unavailable")
 		object Losing : Status(false, "Losing")
 		object Lost : Status(false, "Lost")
-		object Null : Status(false, "Null")
+		object Null : Status(false)
 	}
 }

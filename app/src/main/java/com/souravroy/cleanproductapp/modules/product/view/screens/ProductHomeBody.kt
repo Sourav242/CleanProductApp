@@ -137,10 +137,12 @@ fun ProductBody(
 			)
 
 		if (!networkStatus.status && remote) {
-			ProductsErrorBody(
-				Exception("Internet connection ${networkStatus.networkStatus}"),
-				snackbarState
-			)
+			networkStatus.networkStatus?.let {
+				ProductsErrorBody(
+					Exception("Internet connection $it"),
+					snackbarState
+				)
+			}
 
 			Column(
 				modifier = Modifier.fillMaxSize(),
@@ -151,7 +153,10 @@ fun ProductBody(
 					onClick = { navController?.navigate(PRODUCT_SAVED) },
 					modifier = Modifier.padding(16.dp)
 				) {
-					Text(text = stringResource(R.string.go_to_bookmarks))
+					Text(
+						text = stringResource(R.string.go_to_bookmarks),
+						color = MaterialTheme.colorScheme.background
+					)
 				}
 				Button(
 					onClick = {
@@ -159,7 +164,10 @@ fun ProductBody(
 						navController?.navigate(PRODUCT_HOME)
 					}
 				) {
-					Text(text = stringResource(R.string.retry))
+					Text(
+						text = stringResource(R.string.retry),
+						color = MaterialTheme.colorScheme.background
+					)
 				}
 			}
 		} else {
