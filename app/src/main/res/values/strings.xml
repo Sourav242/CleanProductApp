@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Product App (Clean)</string>
+    <string name="favourite">Favourite</string>
+    <string name="product_details">Product Details</string>
+    <string name="search_products">Search Products</string>
+    <string name="clear_text">Clear text</string>
+    <string name="no_products_available">No products available</string>
+    <string name="go_to_bookmarks">Go to bookmarks</string>
+    <string name="retry">Retry</string>
+</resources>
