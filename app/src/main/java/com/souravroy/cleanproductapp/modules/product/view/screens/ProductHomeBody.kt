@@ -2,6 +2,7 @@ package com.souravroy.cleanproductapp.modules.product.view.screens
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
@@ -41,9 +43,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -59,6 +62,7 @@ import com.souravroy.cleanproductapp.R
 import com.souravroy.cleanproductapp.base.model.ResponseState
 import com.souravroy.cleanproductapp.modules.product.model.Product
 import com.souravroy.cleanproductapp.modules.product.utils.connection.ConnectivityObserver
+import com.souravroy.cleanproductapp.modules.product.utils.custom.RatingBar
 import com.souravroy.cleanproductapp.modules.product.utils.validateSearchText
 import com.souravroy.cleanproductapp.modules.product.view.Greeting
 import com.souravroy.cleanproductapp.modules.product.view.screens.NavigationRoutes.PRODUCT_DETAILS
@@ -66,6 +70,8 @@ import com.souravroy.cleanproductapp.modules.product.view.screens.NavigationRout
 import com.souravroy.cleanproductapp.modules.product.view.screens.NavigationRoutes.PRODUCT_SAVED
 import com.souravroy.cleanproductapp.modules.product.viewmodel.ProductViewModel
 import com.souravroy.cleanproductapp.ui.theme.CleanProductAppTheme
+import com.souravroy.cleanproductapp.ui.theme.success
+import com.souravroy.cleanproductapp.ui.theme.warning
 
 /**
  * @Author: Sourav PC
@@ -159,56 +165,78 @@ fun ProductBody(
 		} else {
 			SearchBody(viewModel, remote)
 
-			val productsState = if (remote)
-				viewModel.productsResponseState.collectAsStateWithLifecycle()
-			else
-				viewModel.productsSavedResponseState.collectAsStateWithLifecycle()
+			Box {
+				val productsState = if (remote)
+					viewModel.productsResponseState.collectAsStateWithLifecycle()
+				else
+					viewModel.productsSavedResponseState.collectAsStateWithLifecycle()
 
-			when (productsState.value) {
-				is ResponseState.Success -> {
-					productsState.value.data?.let {
-						if (it.isEmpty()) {
-							Text(
-								modifier = Modifier.fillMaxSize(),
-								text = stringResource(R.string.no_products_available),
-								textAlign = TextAlign.Center
-							)
-						} else {
-							Products(viewModel, it, navController, snackbarState)
-						}
-					}
-				}
-
-				is ResponseState.Failure -> {
-					productsState.value.error?.let {
-						ProductsErrorBody(it, snackbarState)
-						Box(
-							contentAlignment = Alignment.Center,
-							modifier = Modifier.fillMaxSize()
-						) {
-							Button(
-								onClick = {
-									navController?.popBackStack()
-									navController?.navigate(PRODUCT_HOME)
-								},
-								modifier = Modifier.padding(16.dp)
-							) {
-								Text(text = stringResource(id = R.string.retry))
+				when (productsState.value) {
+					is ResponseState.Success -> {
+						productsState.value.data?.let {
+							if (it.isEmpty()) {
+								Text(
+									modifier = Modifier.fillMaxSize(),
+									text = stringResource(R.string.no_products_available),
+									textAlign = TextAlign.Center
+								)
+							} else {
+								Products(viewModel, it, navController, snackbarState)
 							}
 						}
 					}
+
+					is ResponseState.Failure -> {
+						productsState.value.error?.let {
+							ProductsErrorBody(it, snackbarState)
+							Box(
+								contentAlignment = Alignment.Center,
+								modifier = Modifier.fillMaxSize()
+							) {
+								Button(
+									onClick = {
+										navController?.popBackStack()
+										navController?.navigate(PRODUCT_HOME)
+									},
+									modifier = Modifier.padding(16.dp)
+								) {
+									Text(text = stringResource(id = R.string.retry))
+								}
+							}
+						}
+					}
+
+					is ResponseState.Loading, is ResponseState.LoadingWithData -> {
+						LoadingBody()
+					}
+
+					else -> {
+
+					}
 				}
 
-				is ResponseState.Loading, is ResponseState.LoadingWithData -> {
-					LoadingBody()
-				}
-
-				else -> {
-
-				}
+				Decoration()
 			}
 		}
 	}
+}
+
+@Composable
+fun Decoration() {
+	Box(
+		modifier = Modifier
+			.fillMaxWidth()
+			.height(16.dp)
+			.background(
+				brush = Brush.verticalGradient(
+					colors = listOf(
+						colorResource(id = R.color.shadow_color_1),
+						colorResource(id = R.color.shadow_color_2),
+						colorResource(id = android.R.color.transparent)
+					)
+				)
+			)
+	)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -221,7 +249,7 @@ fun SearchBody(viewModel: ProductViewModel, remote: Boolean) {
 			end = 16.dp,
 			bottom = 16.dp
 		),
-		border = BorderStroke(0.5.dp, Color.Black),
+		border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outline),
 		colors = CardDefaults.cardColors(
 			containerColor = MaterialTheme.colorScheme.surfaceVariant
 		)
@@ -288,7 +316,13 @@ fun Products(
 
 	LazyColumn(state = scrollState) {
 		items(products) {
-			ProductItem(it, viewModel, navController, snackbarState)
+			val modifier = Modifier.padding(
+				start = 16.dp,
+				end = 16.dp,
+				top = 16.dp,
+				bottom = if (products[products.size - 1] == it) 16.dp else 0.dp
+			)
+			ProductItem(it, viewModel, navController, snackbarState, modifier)
 		}
 	}
 }
@@ -298,24 +332,20 @@ fun ProductItem(
 	product: Product,
 	viewModel: ProductViewModel,
 	navController: NavController? = null,
-	snackbarState: SnackbarHostState
+	snackbarState: SnackbarHostState,
+	modifier: Modifier
 ) {
 	Card(
-		modifier = Modifier
-			.padding(
-				start = 16.dp,
-				end = 16.dp,
-				bottom = 16.dp
-			)
+		modifier = modifier
 			.clickable {
 				navController?.navigate(
 					PRODUCT_DETAILS.replace(
 						oldValue = "{id}",
-						newValue = "1"
+						newValue = product.id.toString()
 					)
 				)
 			},
-		border = BorderStroke(0.5.dp, Color.Black),
+		border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outline),
 		colors = CardDefaults.cardColors(
 			containerColor = MaterialTheme.colorScheme.surfaceVariant
 		),
@@ -415,51 +445,86 @@ fun ProductDetails(
 			)
 			Column(modifier = Modifier.padding(all = 16.dp)) {
 				Text(
-					text = product.brand,
+					text = product.title,
 					fontSize = 16.sp
 				)
 				Text(text = product.description)
-				Row {
-					Text(text = "Rating - ")
-					Text(
-						text = product.rating.toString(),
-						color = if (product.rating > 4) {
-							Color.Green
-						} else if (product.rating > 2) {
-							Color.Yellow
-						} else {
-							Color.Red
-						}
-					)
-				}
+
+				RatingBar(
+					rating = product.rating,
+					color = if (product.rating > 4) {
+						MaterialTheme.colorScheme.success
+					} else if (product.rating > 2) {
+						MaterialTheme.colorScheme.warning
+					} else {
+						MaterialTheme.colorScheme.error
+					},
+					modifier = Modifier.height(14.dp)
+				)
 				if (product.discountPercentage <= 0) {
 					Text(
 						text = "Price - $${product.price}",
 						modifier = Modifier.padding(start = 8.dp)
 					)
 				} else {
-					Row {
+					Row(
+						verticalAlignment = Alignment.CenterVertically
+					) {
 						Text(
 							text = "-${product.discountPercentage}%",
-							color = Color.Red
+							color = MaterialTheme.colorScheme.error,
+							fontSize = 16.sp
 						)
 						Text(
-							text = "$${product.price + (product.price * product.discountPercentage / 100)}",
+							text = "$${product.price + (product.price * product.discountPercentage / 100).toInt()}",
 							modifier = Modifier.padding(start = 8.dp),
 							style = TextStyle(textDecoration = TextDecoration.LineThrough),
-							color = Color.DarkGray
+							color = MaterialTheme.colorScheme.outline
 						)
 						Text(
 							text = "$${product.price}",
-							modifier = Modifier.padding(start = 8.dp)
+							modifier = Modifier.padding(start = 8.dp),
+							fontSize = 16.sp,
+							color = MaterialTheme.colorScheme.inverseSurface
 						)
 					}
 				}
-				Text(
-					text = "[${product.category}]",
-					fontSize = 12.sp
-				)
+				if (product.stock == 1) {
+					Text(
+						text = "Hurry up stock's last",
+						color = MaterialTheme.colorScheme.warning,
+						fontSize = 12.sp
+					)
+				} else if (product.stock < 10) {
+					Text(
+						text = "Hurry up only ${product.stock} left",
+						color = MaterialTheme.colorScheme.warning,
+						fontSize = 12.sp
+					)
+				}
 			}
+		}
+		Box(
+			modifier = Modifier.background(
+				brush = Brush.horizontalGradient(
+					colors = listOf(
+						MaterialTheme.colorScheme.primary,
+						MaterialTheme.colorScheme.primary,
+						MaterialTheme.colorScheme.primary,
+						colorResource(id = android.R.color.transparent)
+					)
+				)
+			)
+		) {
+			Text(
+				modifier = Modifier.padding(
+					start = 8.dp,
+					end = 16.dp
+				),
+				text = product.category,
+				color = MaterialTheme.colorScheme.inversePrimary,
+				fontSize = 12.sp
+			)
 		}
 		Favourite(
 			modifier = Modifier
