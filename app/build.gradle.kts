@@ -128,7 +128,6 @@ dependencies {
 	androidTestImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
 	androidTestImplementation("io.mockk:mockk-android:1.13.5")
 	androidTestImplementation("android.arch.core:core-testing:1.1.1")
-	androidTestImplementation("androidx.test:core:1.5.0")
 
 	testImplementation("junit:junit:4.13.2")
 	androidTestImplementation("androidx.test.ext:junit:1.1.5")

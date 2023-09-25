@@ -2,7 +2,7 @@ package com.souravroy.cleanproductapp.modules.product.viewmodel
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule
 import android.content.Context
-import androidx.test.core.app.ApplicationProvider
+import androidx.test.platform.app.InstrumentationRegistry
 import com.souravroy.cleanproductapp.base.model.ResponseModel
 import com.souravroy.cleanproductapp.base.test.BaseTest
 import com.souravroy.cleanproductapp.modules.product.model.Product
@@ -41,14 +41,13 @@ class ProductViewModelTest : BaseTest() {
 
 	private var repository: ProductRepository = mockk(relaxed = true)
 
-	private val context: Context = ApplicationProvider.getApplicationContext()
+    private val context: Context = InstrumentationRegistry.getInstrumentation().targetContext
 
 	private lateinit var viewModel: ProductViewModel
 
 	@BeforeEach
 	override fun beforeEach() {
 		super.beforeEach()
-		viewModel = spyk(ProductViewModel(repository, context))
 	}
 
 	@AfterEach
@@ -60,6 +59,7 @@ class ProductViewModelTest : BaseTest() {
 	@Before
 	fun setup() {
 		MockKAnnotations.init(this, relaxed = true)
+        viewModel = spyk(ProductViewModel(repository, context))
 	}
 
 	@Test
