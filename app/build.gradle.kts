@@ -53,7 +53,14 @@ android {
 	}
 	packaging {
 		resources {
-			excludes += "/META-INF/{AL2.0,LGPL2.1}"
+			excludes += "/META-INF/*"
+		}
+	}
+	testOptions {
+		packaging {
+			jniLibs {
+				useLegacyPackaging = true
+			}
 		}
 	}
 }
@@ -63,6 +70,7 @@ dependencies {
 	val hiltVersion = "2.45"
 	val lifecycleVersion = "2.6.2"
 	val roomVersion = "2.5.2"
+	val coroutinesVersion = "1.7.1"
 
 	implementation("androidx.core:core-ktx:1.9.0")
 	implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
@@ -100,8 +108,9 @@ dependencies {
 	implementation("com.squareup.retrofit2:converter-gson:2.2.0")
 
 	// Coroutines
-	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1")
-	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1")
+	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesVersion")
+	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
+	testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
 
 	//room db
 	implementation("androidx.room:room-runtime:$roomVersion")
@@ -112,6 +121,14 @@ dependencies {
 
 	// optional - Kotlin Extensions and Coroutines support for Room
 	implementation("androidx.room:room-ktx:$roomVersion")
+
+	//mockK
+	testImplementation("io.mockk:mockk:1.13.5")
+	testImplementation("app.cash.turbine:turbine:1.0.0")
+	androidTestImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
+	androidTestImplementation("io.mockk:mockk-android:1.13.5")
+	androidTestImplementation("android.arch.core:core-testing:1.1.1")
+	androidTestImplementation("androidx.test:core:1.5.0")
 
 	testImplementation("junit:junit:4.13.2")
 	androidTestImplementation("androidx.test.ext:junit:1.1.5")
