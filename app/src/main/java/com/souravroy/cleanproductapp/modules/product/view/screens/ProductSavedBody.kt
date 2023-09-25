@@ -20,6 +20,7 @@ import com.souravroy.cleanproductapp.ui.theme.CleanProductAppTheme
 
 /**
  * @Author: Sourav PC
+ * @Email: 1994sourav@gmail.com
  * @Date: 22-09-2023
  */
 
