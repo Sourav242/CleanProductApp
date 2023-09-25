@@ -20,7 +20,7 @@ import javax.inject.Singleton
 class ProductNetworkModule {
 	@Singleton
 	@Provides
-	fun providesRetrofitBuilder() = Retrofit.Builder()
+	fun providesRetrofitBuilder(): Retrofit = Retrofit.Builder()
 		.baseUrl(BuildConfig.BASE_URL)
 		.addConverterFactory(GsonConverterFactory.create())
 		.build()
