@@ -1,7 +1,7 @@
 package com.souravroy.cleanproductapp.modules.product.view.screens
 
 /**
- * @Author: Sourav PC
+ * @Author: Sourav Roy
  * @Email: 1994sourav@gmail.com
  * @Date: 22-09-2023
  */

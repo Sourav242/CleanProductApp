@@ -10,7 +10,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
 /**
- * @Author: Sourav PC
+ * @Author: Sourav Roy
  * @Email: 1994sourav@gmail.com
  * @Date: 21-09-2023
  */

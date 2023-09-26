@@ -3,7 +3,7 @@ package com.souravroy.cleanproductapp.modules.product.utils
 import com.souravroy.cleanproductapp.modules.product.utils.ProductConstants.MIN_TEXT_LENGTH_SEARCH
 
 /**
- * @Author: Sourav PC
+ * @Author: Sourav Roy
  * @Email: 1994sourav@gmail.com
  * @Date: 22-09-2023
  */

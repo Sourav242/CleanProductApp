@@ -8,7 +8,7 @@ import com.souravroy.cleanproductapp.modules.product.repository.datasource.local
 import com.souravroy.cleanproductapp.modules.product.utils.ProductConstants
 
 /**
- * @Author: Sourav PC
+ * @Author: Sourav Roy
  * @Email: 1994sourav@gmail.com
  * @Date: 21-09-2023
  */
