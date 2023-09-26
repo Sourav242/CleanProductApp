@@ -7,9 +7,11 @@ import com.souravroy.cleanproductapp.base.model.ResponseModel
 import com.souravroy.cleanproductapp.base.model.ResponseState
 import com.souravroy.cleanproductapp.base.viewmodel.BaseViewModel
 import com.souravroy.cleanproductapp.modules.product.model.Product
+import com.souravroy.cleanproductapp.modules.product.model.ProductUiModel
 import com.souravroy.cleanproductapp.modules.product.repository.ProductRepository
 import com.souravroy.cleanproductapp.modules.product.utils.connection.ConnectivityObserver
 import com.souravroy.cleanproductapp.modules.product.utils.connection.NetworkConnectivityObserver
+import com.souravroy.cleanproductapp.modules.product.utils.validateSearchText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,6 +35,8 @@ class ProductViewModel @Inject constructor(
 	@ApplicationContext context: Context
 ) : BaseViewModel() {
 
+	val productUiModel = ProductUiModel()
+
 	val connectivityObserver: ConnectivityObserver = NetworkConnectivityObserver(context)
 
 	private val _productsResponseState: MutableStateFlow<ResponseState<List<Product>>> =
@@ -52,13 +56,23 @@ class ProductViewModel @Inject constructor(
 		MutableStateFlow(ResponseState.LoadingWithData(data = null))
 	val productSavedResponseState: StateFlow<ResponseState<Product?>> = _productSavedResponseState
 
-	private val _productSavedState: MutableStateFlow<ResponseState<Long>> =
-		MutableStateFlow(ResponseState.LoadingWithData(0L))
-	val productSavedState: StateFlow<ResponseState<Long>> = _productSavedState
+	private val _productSavedState: MutableStateFlow<ResponseState<Product?>> =
+		MutableStateFlow(ResponseState.LoadingWithData(data = null))
+	val productSavedState: StateFlow<ResponseState<Product?>> = _productSavedState
 
 	init {
 		getProducts()
 		getSavedProducts()
+	}
+
+	fun searchProducts(search: String) {
+		if (search.validateSearchText()) {
+			productUiModel.searchText = search
+			if (productUiModel.remote)
+				getProducts(search)
+			else
+				getSavedProducts(search)
+		}
 	}
 
 	fun getProducts(search: String? = null) = viewModelScope.launch {
@@ -140,7 +154,7 @@ class ProductViewModel @Inject constructor(
 	}
 
 	fun save(product: Product) = viewModelScope.launch {
-		_productSavedState.value = ResponseState.Loading()
+		_productSavedState.value = ResponseState.LoadingWithData(product)
 		repository.local.save(product)
 			.catch { error ->
 				_productSavedState.value = ResponseState.Failure(error)
@@ -151,14 +165,14 @@ class ProductViewModel @Inject constructor(
 				0L
 			).collect {
 				if (it > 0) {
-					_productSavedState.value = ResponseState.Success(it)
+					_productSavedState.value = ResponseState.Success(product)
 					Log.e("#product - response", "Product Saved [$product.id] - $it")
 				}
 			}
 	}
 
 	fun remove(product: Product) = viewModelScope.launch {
-		_productSavedState.value = ResponseState.Loading()
+		_productSavedState.value = ResponseState.LoadingWithData(product)
 		repository.local.remove(product)
 			.catch { error ->
 				_productSavedState.value = ResponseState.Failure(error)
@@ -169,13 +183,13 @@ class ProductViewModel @Inject constructor(
 				0
 			).collect {
 				if (it > 0) {
-					_productSavedState.value = ResponseState.Success(it.toLong())
+					_productSavedState.value = ResponseState.Success(product)
 					Log.e("#product - response", "Product Removed [$product.id] - $it")
 				}
 			}
 	}
 
 	fun reInitializeProductSavedState() {
-		_productSavedState.value = ResponseState.LoadingWithData(data = 0L)
+		_productSavedState.value = ResponseState.LoadingWithData(data = null)
 	}
 }

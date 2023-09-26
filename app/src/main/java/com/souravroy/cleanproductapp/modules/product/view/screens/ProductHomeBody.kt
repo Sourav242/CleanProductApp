@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -40,7 +41,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -63,7 +63,6 @@ import com.souravroy.cleanproductapp.base.model.ResponseState
 import com.souravroy.cleanproductapp.modules.product.model.Product
 import com.souravroy.cleanproductapp.modules.product.utils.connection.ConnectivityObserver
 import com.souravroy.cleanproductapp.modules.product.utils.custom.RatingBar
-import com.souravroy.cleanproductapp.modules.product.utils.validateSearchText
 import com.souravroy.cleanproductapp.modules.product.view.Greeting
 import com.souravroy.cleanproductapp.modules.product.view.screens.NavigationRoutes.PRODUCT_DETAILS
 import com.souravroy.cleanproductapp.modules.product.view.screens.NavigationRoutes.PRODUCT_HOME
@@ -128,6 +127,7 @@ fun ProductBody(
 	remote: Boolean = true,
 	snackbarState: SnackbarHostState
 ) {
+	viewModel.productUiModel.remote = remote
 	Column(
 		modifier = Modifier.padding(contentPadding)
 	) {
@@ -137,7 +137,7 @@ fun ProductBody(
 				initialValue = ConnectivityObserver.Status.Null
 			)
 
-		if (!networkStatus.status && remote) {
+		if (!networkStatus.status && viewModel.productUiModel.remote) {
 			networkStatus.networkStatus?.let {
 				ProductsErrorBody(
 					Exception("Internet connection $it"),
@@ -172,10 +172,10 @@ fun ProductBody(
 				}
 			}
 		} else {
-			SearchBody(viewModel, remote)
+			SearchBody(viewModel)
 
 			Box {
-				val productsState = if (remote)
+				val productsState = if (viewModel.productUiModel.remote)
 					viewModel.productsResponseState.collectAsStateWithLifecycle()
 				else
 					viewModel.productsSavedResponseState.collectAsStateWithLifecycle()
@@ -250,8 +250,9 @@ fun Decoration() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchBody(viewModel: ProductViewModel, remote: Boolean) {
-	val inputValue = remember { mutableStateOf(TextFieldValue()) }
+fun SearchBody(viewModel: ProductViewModel) {
+	val inputValue =
+		remember { mutableStateOf(TextFieldValue(viewModel.productUiModel.searchText)) }
 	Card(
 		modifier = Modifier.padding(
 			start = 16.dp,
@@ -273,12 +274,7 @@ fun SearchBody(viewModel: ProductViewModel, remote: Boolean) {
 				// on value change in text field.
 				onValueChange = {
 					inputValue.value = it
-					if (inputValue.value.text.validateSearchText()) {
-						if (remote)
-							viewModel.getProducts(inputValue.value.text)
-						else
-							viewModel.getSavedProducts(inputValue.value.text)
-					}
+					viewModel.searchProducts(it.text)
 				},
 				trailingIcon = {
 					if (inputValue.value.text.isNotEmpty()) {
@@ -287,8 +283,10 @@ fun SearchBody(viewModel: ProductViewModel, remote: Boolean) {
 							contentDescription = stringResource(R.string.clear_text),
 							modifier = Modifier
 								.clickable {
-									inputValue.value = TextFieldValue("")
-									if (remote)
+									val emptyText = ""
+									inputValue.value = TextFieldValue(emptyText)
+									viewModel.productUiModel.searchText = emptyText
+									if (viewModel.productUiModel.remote)
 										viewModel.getProducts()
 									else
 										viewModel.getSavedProducts(inputValue.value.text)
@@ -370,12 +368,21 @@ fun Favourite(
 	viewModel: ProductViewModel,
 	snackbarState: SnackbarHostState
 ) {
-	var fav by remember { mutableStateOf(product in savedProducts) }
-
 	val savedState = viewModel.productSavedState.collectAsStateWithLifecycle()
 	when (savedState.value) {
 		is ResponseState.Success -> {
 			viewModel.getSavedProducts()
+			if (product != savedState.value.data) {
+				FavIcon(modifier, product, viewModel)
+			}
+		}
+
+		is ResponseState.LoadingWithData -> {
+			if (savedState.value.data != null && product == savedState.value.data) {
+				FavLoader(modifier)
+			} else {
+				FavIcon(modifier, product, viewModel)
+			}
 		}
 
 		else -> {}
@@ -388,7 +395,6 @@ fun Favourite(
 		is ResponseState.Success -> {
 			savedProductsState.value.data?.let {
 				savedProducts = it
-				fav = product in savedProducts
 				viewModel.reInitializeProductSavedState()
 			}
 		}
@@ -396,24 +402,28 @@ fun Favourite(
 		is ResponseState.Failure -> {
 			savedProductsState.value.error?.let {
 				ProductsErrorBody(it, snackbarState)
-				viewModel.productsSavedResponseState
 			}
 		}
 
-		is ResponseState.Loading, is ResponseState.LoadingWithData -> {
-
+		is ResponseState.LoadingWithData -> {
+			if (product == savedState.value.data) {
+				FavLoader(modifier)
+			}
 		}
 
 		else -> {
-			Box(
-				modifier = modifier,
-				contentAlignment = Alignment.TopEnd
-			) {
-				CircularProgressIndicator()
-			}
+
 		}
 	}
+}
 
+@Composable
+fun FavIcon(
+	modifier: Modifier,
+	product: Product,
+	viewModel: ProductViewModel
+) {
+	val fav = product in savedProducts
 	Image(
 		painter = if (fav)
 			painterResource(R.drawable.baseline_bookmark_24)
@@ -429,6 +439,18 @@ fun Favourite(
 		},
 		colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.inverseOnSurface)
 	)
+}
+
+@Composable
+fun FavLoader(modifier: Modifier) {
+	Box(
+		modifier = modifier,
+		contentAlignment = Alignment.TopEnd
+	) {
+		CircularProgressIndicator(
+			modifier = Modifier.size(24.dp)
+		)
+	}
 }
 
 @Composable
