@@ -17,6 +17,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.stateIn
@@ -41,24 +42,27 @@ class ProductViewModel @Inject constructor(
 
 	private val _productsResponseState: MutableStateFlow<ResponseState<List<Product>>> =
 		MutableStateFlow(ResponseState.LoadingWithData(listOf()))
-	val productsResponseState: StateFlow<ResponseState<List<Product>>> = this._productsResponseState
+	val productsResponseState: StateFlow<ResponseState<List<Product>>> =
+		this._productsResponseState.asStateFlow()
 
 	private val _productResponseState: MutableStateFlow<ResponseState<Product?>> =
 		MutableStateFlow(ResponseState.LoadingWithData(data = null))
-	val productResponseState: StateFlow<ResponseState<Product?>> = _productResponseState
+	val productResponseState: StateFlow<ResponseState<Product?>> =
+		_productResponseState.asStateFlow()
 
 	private val _productsSavedResponseState: MutableStateFlow<ResponseState<List<Product>>> =
 		MutableStateFlow(ResponseState.LoadingWithData(listOf()))
 	val productsSavedResponseState: StateFlow<ResponseState<List<Product>>> =
-		this._productsSavedResponseState
+		this._productsSavedResponseState.asStateFlow()
 
 	private val _productSavedResponseState: MutableStateFlow<ResponseState<Product?>> =
 		MutableStateFlow(ResponseState.LoadingWithData(data = null))
-	val productSavedResponseState: StateFlow<ResponseState<Product?>> = _productSavedResponseState
+	val productSavedResponseState: StateFlow<ResponseState<Product?>> =
+		_productSavedResponseState.asStateFlow()
 
 	private val _productSavedState: MutableStateFlow<ResponseState<Product?>> =
 		MutableStateFlow(ResponseState.LoadingWithData(data = null))
-	val productSavedState: StateFlow<ResponseState<Product?>> = _productSavedState
+	val productSavedState: StateFlow<ResponseState<Product?>> = _productSavedState.asStateFlow()
 
 	init {
 		getProducts()
@@ -116,7 +120,10 @@ class ProductViewModel @Inject constructor(
 	}
 
 	fun getSavedProducts(search: String? = null) = viewModelScope.launch {
-		_productsSavedResponseState.value = ResponseState.Loading()
+		val savedProducts = _productsSavedResponseState.value.data
+		if (savedProducts.isNullOrEmpty()) {
+			_productsSavedResponseState.value = ResponseState.Loading()
+		}
 		repository.local.getProducts(search)
 			.catch { error ->
 				_productsSavedResponseState.value = ResponseState.Failure(error)
@@ -124,7 +131,7 @@ class ProductViewModel @Inject constructor(
 			}.stateIn(
 				viewModelScope,
 				SharingStarted.Eagerly,
-				_productsSavedResponseState.value.data
+				savedProducts
 			).collectLatest {
 				it?.let {
 					_productsSavedResponseState.value = ResponseState.Success(it)

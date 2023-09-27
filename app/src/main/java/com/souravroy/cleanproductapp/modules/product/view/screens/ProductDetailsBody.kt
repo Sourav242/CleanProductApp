@@ -11,6 +11,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -19,6 +20,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.souravroy.cleanproductapp.R
 import com.souravroy.cleanproductapp.base.model.ResponseState
+import com.souravroy.cleanproductapp.modules.product.utils.connection.ConnectivityObserver
 import com.souravroy.cleanproductapp.modules.product.view.Greeting
 import com.souravroy.cleanproductapp.modules.product.viewmodel.ProductViewModel
 import com.souravroy.cleanproductapp.ui.theme.CleanProductAppTheme
@@ -33,10 +35,6 @@ import com.souravroy.cleanproductapp.ui.theme.CleanProductAppTheme
 @Composable
 fun ProductDetailsBody(viewModel: ProductViewModel, navController: NavController? = null) {
 	val snackbarState = remember { SnackbarHostState() }
-	val id = navController?.currentBackStackEntry?.arguments?.getString("id")
-	id?.let {
-		viewModel.getProduct(it.toInt())
-	}
 
 	CleanProductAppTheme {
 		// A surface container using the 'background' color from the theme
@@ -67,7 +65,29 @@ fun ProductDetailsBody(viewModel: ProductViewModel, navController: NavController
 				}
 			) { contentPadding ->
 
-				val productState = viewModel.productResponseState.collectAsStateWithLifecycle()
+				val networkStatus by viewModel.connectivityObserver.observe()
+					.collectAsStateWithLifecycle(
+						initialValue = ConnectivityObserver.NetworkStatus.Null
+					)
+
+				val id = navController?.currentBackStackEntry?.arguments?.getString("id")
+
+				val productState = when (networkStatus) {
+					is ConnectivityObserver.NetworkStatus.Available -> {
+						id?.let {
+							viewModel.getProduct(it.toInt())
+						}
+						viewModel.productResponseState.collectAsStateWithLifecycle()
+					}
+
+					else -> {
+						id?.let {
+							viewModel.getSavedProduct(it.toInt())
+						}
+						viewModel.productSavedResponseState.collectAsStateWithLifecycle()
+					}
+				}
+
 				when (productState.value) {
 					is ResponseState.Success -> {
 						productState.value.data?.let {
@@ -81,13 +101,7 @@ fun ProductDetailsBody(viewModel: ProductViewModel, navController: NavController
 						}
 					}
 
-					is ResponseState.Loading, is ResponseState.LoadingWithData -> {
-						LoadingBody()
-					}
-
-					else -> {
-
-					}
+					else -> {}
 				}
 			}
 		}

@@ -134,98 +134,136 @@ fun ProductBody(
 
 		val networkStatus by viewModel.connectivityObserver.observe()
 			.collectAsStateWithLifecycle(
-				initialValue = ConnectivityObserver.Status.Null
+				initialValue = ConnectivityObserver.NetworkStatus.Null
 			)
 
-		if (!networkStatus.status && viewModel.productUiModel.remote) {
-			networkStatus.networkStatus?.let {
-				ProductsErrorBody(
-					Exception("Internet connection $it"),
+		when (networkStatus) {
+			is ConnectivityObserver.NetworkStatus.Available -> {
+				ShowProducts(
+					viewModel,
+					navController,
 					snackbarState
 				)
 			}
 
-			Column(
-				modifier = Modifier.fillMaxSize(),
-				verticalArrangement = Arrangement.Center,
-				horizontalAlignment = Alignment.CenterHorizontally
-			) {
-				Button(
-					onClick = { navController?.navigate(PRODUCT_SAVED) },
-					modifier = Modifier.padding(16.dp)
-				) {
-					Text(
-						text = stringResource(R.string.go_to_bookmarks),
-						color = MaterialTheme.colorScheme.background
+			else -> {
+				if (viewModel.productUiModel.remote) {
+					ShowNetworkError(
+						navController,
+						snackbarState,
+						networkStatus
 					)
-				}
-				Button(
-					onClick = {
-						navController?.popBackStack()
-						navController?.navigate(PRODUCT_HOME)
-					}
-				) {
-					Text(
-						text = stringResource(R.string.retry),
-						color = MaterialTheme.colorScheme.background
+				} else {
+					ShowProducts(
+						viewModel,
+						navController,
+						snackbarState
 					)
 				}
 			}
-		} else {
-			SearchBody(viewModel)
+		}
+	}
+}
 
-			Box {
-				val productsState = if (viewModel.productUiModel.remote)
-					viewModel.productsResponseState.collectAsStateWithLifecycle()
-				else
-					viewModel.productsSavedResponseState.collectAsStateWithLifecycle()
+@Composable
+fun ShowProducts(
+	viewModel: ProductViewModel,
+	navController: NavController?,
+	snackbarState: SnackbarHostState
+) {
+	SearchBody(viewModel)
 
-				when (productsState.value) {
-					is ResponseState.Success -> {
-						productsState.value.data?.let {
-							if (it.isEmpty()) {
-								Text(
-									modifier = Modifier.fillMaxSize(),
-									text = stringResource(R.string.no_products_available),
-									textAlign = TextAlign.Center
-								)
-							} else {
-								Products(viewModel, it, navController, snackbarState)
-							}
-						}
-					}
+	Box {
+		val productsState = if (viewModel.productUiModel.remote)
+			viewModel.productsResponseState.collectAsStateWithLifecycle()
+		else
+			viewModel.productsSavedResponseState.collectAsStateWithLifecycle()
 
-					is ResponseState.Failure -> {
-						productsState.value.error?.let {
-							ProductsErrorBody(it, snackbarState)
-							Box(
-								contentAlignment = Alignment.Center,
-								modifier = Modifier.fillMaxSize()
-							) {
-								Button(
-									onClick = {
-										navController?.popBackStack()
-										navController?.navigate(PRODUCT_HOME)
-									},
-									modifier = Modifier.padding(16.dp)
-								) {
-									Text(text = stringResource(id = R.string.retry))
-								}
-							}
-						}
-					}
-
-					is ResponseState.Loading, is ResponseState.LoadingWithData -> {
-						LoadingBody()
-					}
-
-					else -> {
-
+		when (productsState.value) {
+			is ResponseState.Success -> {
+				productsState.value.data?.let {
+					if (it.isEmpty()) {
+						Text(
+							modifier = Modifier.fillMaxSize(),
+							text = stringResource(R.string.no_products_available),
+							textAlign = TextAlign.Center
+						)
+					} else {
+						Products(viewModel, it, navController, snackbarState)
 					}
 				}
-
-				Decoration()
 			}
+
+			is ResponseState.Failure -> {
+				productsState.value.error?.let {
+					ProductsErrorBody(it, snackbarState)
+					Box(
+						contentAlignment = Alignment.Center,
+						modifier = Modifier.fillMaxSize()
+					) {
+						Button(
+							onClick = {
+								navController?.popBackStack()
+								navController?.navigate(PRODUCT_HOME)
+							},
+							modifier = Modifier.padding(16.dp)
+						) {
+							Text(text = stringResource(id = R.string.retry))
+						}
+					}
+				}
+			}
+
+			is ResponseState.Loading, is ResponseState.LoadingWithData -> {
+				LoadingBody()
+			}
+
+			else -> {
+
+			}
+		}
+
+		Decoration()
+	}
+}
+
+@Composable
+fun ShowNetworkError(
+	navController: NavController?,
+	snackbarState: SnackbarHostState,
+	networkStatus: ConnectivityObserver.NetworkStatus
+) {
+	networkStatus.networkStatus?.let {
+		ProductsErrorBody(
+			Exception("Internet connection $it"),
+			snackbarState
+		)
+	}
+
+	Column(
+		modifier = Modifier.fillMaxSize(),
+		verticalArrangement = Arrangement.Center,
+		horizontalAlignment = Alignment.CenterHorizontally
+	) {
+		Button(
+			onClick = { navController?.navigate(PRODUCT_SAVED) },
+			modifier = Modifier.padding(16.dp)
+		) {
+			Text(
+				text = stringResource(R.string.go_to_bookmarks),
+				color = MaterialTheme.colorScheme.background
+			)
+		}
+		Button(
+			onClick = {
+				navController?.popBackStack()
+				navController?.navigate(PRODUCT_HOME)
+			}
+		) {
+			Text(
+				text = stringResource(R.string.retry),
+				color = MaterialTheme.colorScheme.background
+			)
 		}
 	}
 }

@@ -9,16 +9,16 @@ import kotlinx.coroutines.flow.Flow
  */
 
 interface ConnectivityObserver {
-	fun observe(): Flow<Status>
+	fun observe(): Flow<NetworkStatus>
 
-	sealed class Status(
+	sealed class NetworkStatus(
 		val status: Boolean,
 		val networkStatus: String? = null
 	) {
-		object Available : Status(true, "Available")
-		object Unavailable : Status(false, "Unavailable")
-		object Losing : Status(false, "Losing")
-		object Lost : Status(false, "Lost")
-		object Null : Status(false)
+		object Available : NetworkStatus(true, "Available")
+		object Unavailable : NetworkStatus(false, "Unavailable")
+		object Losing : NetworkStatus(false, "Losing")
+		object Lost : NetworkStatus(false, "Lost")
+		object Null : NetworkStatus(false)
 	}
 }
