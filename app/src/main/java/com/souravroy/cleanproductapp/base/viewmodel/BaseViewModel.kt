@@ -8,4 +8,4 @@ import androidx.lifecycle.ViewModel
  * @Date: 21-09-2023
  */
 
-abstract class BaseViewModel : ViewModel()
+open class BaseViewModel : ViewModel()
