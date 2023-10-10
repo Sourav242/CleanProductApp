@@ -300,6 +300,9 @@ fun SearchBody(viewModel: ProductViewModel) {
 		border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outline),
 		colors = CardDefaults.cardColors(
 			containerColor = MaterialTheme.colorScheme.surfaceVariant
+		),
+		elevation = CardDefaults.cardElevation(
+			defaultElevation = 4.dp
 		)
 	) {
 		Box {
@@ -394,6 +397,9 @@ fun ProductItem(
 		colors = CardDefaults.cardColors(
 			containerColor = MaterialTheme.colorScheme.surfaceVariant
 		),
+		elevation = CardDefaults.cardElevation(
+			defaultElevation = 4.dp
+		)
 	) {
 		ProductDetails(product, viewModel = viewModel, snackbarState = snackbarState)
 	}
