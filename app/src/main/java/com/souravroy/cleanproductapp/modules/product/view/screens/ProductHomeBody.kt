@@ -83,7 +83,7 @@ private var savedProducts: List<Product> = listOf()
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductHomeBody(viewModel: ProductViewModel, navController: NavController? = null) {
-	val snackbarState = remember { SnackbarHostState() }
+	val snackBarState = remember { SnackbarHostState() }
 
 	CleanProductAppTheme {
 		// A surface container using the 'background' color from the theme
@@ -110,10 +110,10 @@ fun ProductHomeBody(viewModel: ProductViewModel, navController: NavController? =
 					)
 				},
 				snackbarHost = {
-					SnackbarHost(hostState = snackbarState)
+					SnackbarHost(hostState = snackBarState)
 				}
 			) { contentPadding ->
-				ProductBody(viewModel, navController, contentPadding, true, snackbarState)
+				ProductBody(viewModel, navController, contentPadding, true, snackBarState)
 			}
 		}
 	}
@@ -125,7 +125,7 @@ fun ProductBody(
 	navController: NavController?,
 	contentPadding: PaddingValues,
 	remote: Boolean = true,
-	snackbarState: SnackbarHostState
+	snackBarState: SnackbarHostState
 ) {
 	viewModel.productUiModel.remote = remote
 	Column(
@@ -142,7 +142,7 @@ fun ProductBody(
 				ShowProducts(
 					viewModel,
 					navController,
-					snackbarState
+					snackBarState
 				)
 			}
 
@@ -150,14 +150,14 @@ fun ProductBody(
 				if (viewModel.productUiModel.remote) {
 					ShowNetworkError(
 						navController,
-						snackbarState,
+						snackBarState,
 						networkStatus
 					)
 				} else {
 					ShowProducts(
 						viewModel,
 						navController,
-						snackbarState
+						snackBarState
 					)
 				}
 			}
@@ -169,7 +169,7 @@ fun ProductBody(
 fun ShowProducts(
 	viewModel: ProductViewModel,
 	navController: NavController?,
-	snackbarState: SnackbarHostState
+	snackBarState: SnackbarHostState
 ) {
 	SearchBody(viewModel)
 
@@ -189,14 +189,14 @@ fun ShowProducts(
 							textAlign = TextAlign.Center
 						)
 					} else {
-						Products(viewModel, it, navController, snackbarState)
+						Products(viewModel, it, navController, snackBarState)
 					}
 				}
 			}
 
 			is ResponseState.Failure -> {
 				productsState.value.error?.let {
-					ProductsErrorBody(it, snackbarState)
+					ProductsErrorBody(it, snackBarState)
 					Box(
 						contentAlignment = Alignment.Center,
 						modifier = Modifier.fillMaxSize()
@@ -230,13 +230,13 @@ fun ShowProducts(
 @Composable
 fun ShowNetworkError(
 	navController: NavController?,
-	snackbarState: SnackbarHostState,
+	snackBarState: SnackbarHostState,
 	networkStatus: ConnectivityObserver.NetworkStatus
 ) {
 	networkStatus.networkStatus?.let {
 		ProductsErrorBody(
 			Exception("Internet connection $it"),
-			snackbarState
+			snackBarState
 		)
 	}
 
@@ -358,7 +358,7 @@ fun Products(
 	viewModel: ProductViewModel,
 	products: List<Product>,
 	navController: NavController?,
-	snackbarState: SnackbarHostState
+	snackBarState: SnackbarHostState
 ) {
 	val scrollState = rememberLazyListState()
 
@@ -370,7 +370,7 @@ fun Products(
 				top = 16.dp,
 				bottom = if (products[products.size - 1] == it) 16.dp else 0.dp
 			)
-			ProductItem(it, viewModel, navController, snackbarState, modifier)
+			ProductItem(it, viewModel, navController, snackBarState, modifier)
 		}
 	}
 }
@@ -380,7 +380,7 @@ fun ProductItem(
 	product: Product,
 	viewModel: ProductViewModel,
 	navController: NavController? = null,
-	snackbarState: SnackbarHostState,
+	snackBarState: SnackbarHostState,
 	modifier: Modifier
 ) {
 	Card(
@@ -401,7 +401,7 @@ fun ProductItem(
 			defaultElevation = 4.dp
 		)
 	) {
-		ProductDetails(product, viewModel = viewModel, snackbarState = snackbarState)
+		ProductDetails(product, viewModel = viewModel, snackBarState = snackBarState)
 	}
 }
 
@@ -410,7 +410,7 @@ fun Favourite(
 	modifier: Modifier,
 	product: Product,
 	viewModel: ProductViewModel,
-	snackbarState: SnackbarHostState
+	snackBarState: SnackbarHostState
 ) {
 	val savedState = viewModel.productSavedState.collectAsStateWithLifecycle()
 	when (savedState.value) {
@@ -445,7 +445,7 @@ fun Favourite(
 
 		is ResponseState.Failure -> {
 			savedProductsState.value.error?.let {
-				ProductsErrorBody(it, snackbarState)
+				ProductsErrorBody(it, snackBarState)
 			}
 		}
 
@@ -502,7 +502,7 @@ fun ProductDetails(
 	product: Product,
 	viewModel: ProductViewModel,
 	contentPadding: PaddingValues = PaddingValues(0.dp),
-	snackbarState: SnackbarHostState
+	snackBarState: SnackbarHostState
 ) {
 	Box(
 		modifier = Modifier.padding(contentPadding)
@@ -608,7 +608,7 @@ fun ProductDetails(
 				.padding(all = 16.dp),
 			product = product,
 			viewModel = viewModel,
-			snackbarState = snackbarState
+			snackBarState = snackBarState
 		)
 	}
 }
@@ -624,10 +624,10 @@ fun LoadingBody() {
 }
 
 @Composable
-fun ProductsErrorBody(error: Throwable, snackbarHostState: SnackbarHostState) {
+fun ProductsErrorBody(error: Throwable, snackBarHostState: SnackbarHostState) {
 	LaunchedEffect("ProductError") {
 		error.message?.let {
-			snackbarHostState.showSnackbar(
+			snackBarHostState.showSnackbar(
 				it
 			)
 		}
