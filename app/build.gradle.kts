@@ -1,3 +1,5 @@
+@file:Suppress("UnstableApiUsage")
+
 plugins {
 	id("com.android.application")
 	id("org.jetbrains.kotlin.android")
@@ -48,7 +50,7 @@ android {
 		buildConfig = true
 	}
 	composeOptions {
-		kotlinCompilerExtensionVersion = "1.4.5"
+		kotlinCompilerExtensionVersion = "1.5.14"
 	}
 	packaging {
 		resources {
@@ -66,7 +68,7 @@ android {
 
 dependencies {
 	val navVersion = "2.7.7"
-	val hiltVersion = "2.49"
+	val hiltVersion = "2.51.1"
 	val lifecycleVersion = "2.8.2"
 	val roomVersion = "2.6.1"
 	val coroutinesVersion = "1.7.3"
