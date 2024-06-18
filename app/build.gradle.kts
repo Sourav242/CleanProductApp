@@ -66,10 +66,10 @@ android {
 
 dependencies {
 	val navVersion = "2.7.7"
-	val hiltVersion = "2.45"
+	val hiltVersion = "2.49"
 	val lifecycleVersion = "2.8.2"
 	val roomVersion = "2.6.1"
-	val coroutinesVersion = "1.7.1"
+	val coroutinesVersion = "1.7.3"
 
 	implementation("androidx.core:core-ktx:1.13.1")
 	implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.2")
