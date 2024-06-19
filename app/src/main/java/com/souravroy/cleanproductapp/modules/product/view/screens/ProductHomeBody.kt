@@ -71,6 +71,7 @@ import com.souravroy.cleanproductapp.modules.product.viewmodel.ProductViewModel
 import com.souravroy.cleanproductapp.ui.theme.CleanProductAppTheme
 import com.souravroy.cleanproductapp.ui.theme.success
 import com.souravroy.cleanproductapp.ui.theme.warning
+import java.util.Locale
 
 /**
  * @Author: Sourav Roy
@@ -286,7 +287,6 @@ fun Decoration() {
 	)
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchBody(viewModel: ProductViewModel) {
 	val inputValue =
@@ -336,8 +336,10 @@ fun SearchBody(viewModel: ProductViewModel) {
 					}
 				},
 
-				colors = TextFieldDefaults.textFieldColors(
-					containerColor = MaterialTheme.colorScheme.surfaceVariant
+				colors = TextFieldDefaults.colors(
+					focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+					unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+					disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant
 				),
 
 				// below line is used to add placeholder
@@ -539,7 +541,13 @@ fun ProductDetails(
 				)
 				if (product.discountPercentage <= 0) {
 					Text(
-						text = "Price - $${product.price}",
+						text = "Price - $${
+							String.format(
+								Locale.getDefault(),
+								"%.2f",
+								product.price
+							)
+						}",
 						modifier = Modifier.padding(start = 8.dp)
 					)
 				} else {
