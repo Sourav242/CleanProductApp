@@ -70,7 +70,9 @@ fun ProductDetailsBody(viewModel: ProductViewModel, navController: NavController
 						initialValue = ConnectivityObserver.NetworkStatus.Null
 					)
 
-				val id = navController?.currentBackStackEntry?.arguments?.getString("id")
+				val id = navController?.currentBackStackEntry?.arguments?.getString(
+					NavigationRoutes.QueryParams.ID
+				)
 
 				val productState = when (networkStatus) {
 					is ConnectivityObserver.NetworkStatus.Available -> {

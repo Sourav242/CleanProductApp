@@ -390,7 +390,7 @@ fun ProductItem(
 			.clickable {
 				navController?.navigate(
 					PRODUCT_DETAILS.replace(
-						oldValue = "{id}",
+						oldValue = "{${NavigationRoutes.QueryParams.ID}}",
 						newValue = product.id.toString()
 					)
 				)
