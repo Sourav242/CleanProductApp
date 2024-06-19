@@ -34,7 +34,7 @@ import com.souravroy.cleanproductapp.ui.theme.CleanProductAppTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductDetailsBody(viewModel: ProductViewModel, navController: NavController? = null) {
-	val snackbarState = remember { SnackbarHostState() }
+	val snackBarState = remember { SnackbarHostState() }
 
 	CleanProductAppTheme {
 		// A surface container using the 'background' color from the theme
@@ -61,7 +61,7 @@ fun ProductDetailsBody(viewModel: ProductViewModel, navController: NavController
 					)
 				},
 				snackbarHost = {
-					SnackbarHost(hostState = snackbarState)
+					SnackbarHost(hostState = snackBarState)
 				}
 			) { contentPadding ->
 
@@ -91,13 +91,13 @@ fun ProductDetailsBody(viewModel: ProductViewModel, navController: NavController
 				when (productState.value) {
 					is ResponseState.Success -> {
 						productState.value.data?.let {
-							ProductDetails(it, viewModel, contentPadding, snackbarState)
+							ProductDetails(it, viewModel, contentPadding, snackBarState)
 						}
 					}
 
 					is ResponseState.Failure -> {
 						productState.value.error?.let {
-							ProductsErrorBody(it, snackbarState)
+							ProductsErrorBody(it, snackBarState)
 						}
 					}
 
