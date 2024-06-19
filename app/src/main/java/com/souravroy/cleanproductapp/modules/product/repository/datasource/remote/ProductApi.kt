@@ -14,18 +14,26 @@ import retrofit2.http.Query
  */
 
 interface ProductApi {
-	@GET(NavigationRoutes.PRODUCT_HOME)
-	suspend fun getProducts(): ResponseModel<List<Product>>
+    @GET(NavigationRoutes.PRODUCT_HOME)
+    suspend fun getProducts(): ResponseModel<List<Product>>
 
-	@GET("/products/search")
-	suspend fun getProducts(@Query("q") search: String): ResponseModel<List<Product>>
+    @GET(NavigationRoutes.PRODUCT_SEARCH)
+    suspend fun getProducts(
+        @Query(
+            NavigationRoutes.QueryParams.SEARCH
+        ) search: String
+    ): ResponseModel<List<Product>>
 
-	@GET(NavigationRoutes.PRODUCT_DETAILS)
-	suspend fun getProduct(@Path("id") id: Int): Product
+    @GET(NavigationRoutes.PRODUCT_DETAILS)
+    suspend fun getProduct(@Path(NavigationRoutes.QueryParams.ID) id: Int): Product
 
-	@GET("/products/categories")
-	suspend fun getProductCategories(): List<String>
+    @GET(NavigationRoutes.PRODUCT_CATEGORIES)
+    suspend fun getProductCategories(): List<String>
 
-	@GET("/products/categories/{category}")
-	suspend fun getProductsByCategory(@Path("category") category: String): List<Product>
+    @GET(NavigationRoutes.PRODUCT_CATEGORY)
+    suspend fun getProductsByCategory(
+        @Path(
+            NavigationRoutes.QueryParams.CATEGORY
+        ) category: String
+    ): List<Product>
 }
