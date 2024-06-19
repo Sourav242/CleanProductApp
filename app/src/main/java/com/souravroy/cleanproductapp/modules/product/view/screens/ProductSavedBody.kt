@@ -27,7 +27,7 @@ import com.souravroy.cleanproductapp.ui.theme.CleanProductAppTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductSavedBody(viewModel: ProductViewModel, navController: NavController? = null) {
-	val snackbarState = remember { SnackbarHostState() }
+	val snackBarState = remember { SnackbarHostState() }
 	viewModel.getSavedProducts()
 
 	CleanProductAppTheme {
@@ -44,10 +44,10 @@ fun ProductSavedBody(viewModel: ProductViewModel, navController: NavController? 
 						}
 					)
 				}, snackbarHost = {
-					SnackbarHost(hostState = snackbarState)
+					SnackbarHost(hostState = snackBarState)
 				}
 			) { contentPadding ->
-				ProductBody(viewModel, navController, contentPadding, false, snackbarState)
+				ProductBody(viewModel, navController, contentPadding, false, snackBarState)
 			}
 		}
 	}
