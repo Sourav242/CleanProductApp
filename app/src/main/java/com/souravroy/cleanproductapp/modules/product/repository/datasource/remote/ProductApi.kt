@@ -25,7 +25,11 @@ interface ProductApi {
     ): ResponseModel<List<Product>>
 
     @GET(NavigationRoutes.PRODUCT_DETAILS)
-    suspend fun getProduct(@Path(NavigationRoutes.QueryParams.ID) id: Int): Product
+    suspend fun getProduct(
+        @Path(
+            NavigationRoutes.QueryParams.ID
+        ) id: Int
+    ): Product
 
     @GET(NavigationRoutes.PRODUCT_CATEGORIES)
     suspend fun getProductCategories(): List<String>
