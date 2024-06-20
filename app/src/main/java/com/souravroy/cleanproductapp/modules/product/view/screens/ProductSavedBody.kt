@@ -8,6 +8,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -41,7 +42,14 @@ fun ProductSavedBody(viewModel: ProductViewModel, navController: NavController? 
 					TopAppBar(
 						title = {
 							Greeting(name = stringResource(id = R.string.favourite))
-						}
+						},
+						colors = TopAppBarColors(
+							containerColor = MaterialTheme.colorScheme.primary,
+							scrolledContainerColor = MaterialTheme.colorScheme.primary,
+							titleContentColor = MaterialTheme.colorScheme.onPrimary,
+							actionIconContentColor = MaterialTheme.colorScheme.onPrimary,
+							navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+						)
 					)
 				}, snackbarHost = {
 					SnackbarHost(hostState = snackBarState)

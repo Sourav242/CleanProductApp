@@ -20,11 +20,13 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -36,6 +38,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -107,11 +110,30 @@ fun ProductHomeBody(viewModel: ProductViewModel, navController: NavController? =
 									contentDescription = stringResource(id = R.string.favourite)
 								)
 							}
-						}
+						},
+						colors = TopAppBarColors(
+							containerColor = MaterialTheme.colorScheme.primary,
+							scrolledContainerColor = MaterialTheme.colorScheme.primary,
+							titleContentColor = MaterialTheme.colorScheme.onPrimary,
+							actionIconContentColor = MaterialTheme.colorScheme.onPrimary,
+							navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+						)
 					)
 				},
 				snackbarHost = {
 					SnackbarHost(hostState = snackBarState)
+				},
+				floatingActionButton = {
+					FloatingActionButton(
+						onClick = { navController?.navigate(PRODUCT_SAVED) },
+						containerColor = MaterialTheme.colorScheme.secondary,
+						contentColor = MaterialTheme.colorScheme.onSecondary
+					) {
+						Icon(
+							painter = painterResource(id = R.drawable.baseline_bookmark_24),
+							contentDescription = stringResource(id = R.string.favourite)
+						)
+					}
 				}
 			) { contentPadding ->
 				ProductBody(viewModel, navController, contentPadding, true, snackBarState)
@@ -130,7 +152,11 @@ fun ProductBody(
 ) {
 	viewModel.productUiModel.remote = remote
 	Column(
-		modifier = Modifier.padding(contentPadding)
+		modifier = Modifier
+			.padding(contentPadding)
+			.background(
+				color = MaterialTheme.colorScheme.primary
+			)
 	) {
 
 		val networkStatus by viewModel.connectivityObserver.observe()
@@ -174,7 +200,11 @@ fun ShowProducts(
 ) {
 	SearchBody(viewModel)
 
-	Box {
+	Box(
+		modifier = Modifier.background(
+			color = MaterialTheme.colorScheme.background
+		)
+	) {
 		val productsState = if (viewModel.productUiModel.remote)
 			viewModel.productsResponseState.collectAsStateWithLifecycle()
 		else
@@ -242,7 +272,11 @@ fun ShowNetworkError(
 	}
 
 	Column(
-		modifier = Modifier.fillMaxSize(),
+		modifier = Modifier
+			.fillMaxSize()
+			.background(
+				color = MaterialTheme.colorScheme.background
+			),
 		verticalArrangement = Arrangement.Center,
 		horizontalAlignment = Alignment.CenterHorizontally
 	) {
@@ -292,11 +326,15 @@ fun SearchBody(viewModel: ProductViewModel) {
 	val inputValue =
 		remember { mutableStateOf(TextFieldValue(viewModel.productUiModel.searchText)) }
 	Card(
-		modifier = Modifier.padding(
-			start = 16.dp,
-			end = 16.dp,
-			bottom = 16.dp
-		),
+		modifier = Modifier
+			.padding(
+				start = 16.dp,
+				end = 16.dp,
+				bottom = 16.dp
+			)
+			.background(
+				color = MaterialTheme.colorScheme.primary
+			),
 		border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outline),
 		colors = CardDefaults.cardColors(
 			containerColor = MaterialTheme.colorScheme.surfaceVariant
@@ -316,6 +354,12 @@ fun SearchBody(viewModel: ProductViewModel) {
 				onValueChange = {
 					inputValue.value = it
 					viewModel.searchProducts(it.text)
+				},
+				leadingIcon = {
+					Icon(
+						Icons.Default.Search,
+						contentDescription = stringResource(R.string.search_products)
+					)
 				},
 				trailingIcon = {
 					if (inputValue.value.text.isNotEmpty()) {
@@ -364,7 +408,10 @@ fun Products(
 ) {
 	val scrollState = rememberLazyListState()
 
-	LazyColumn(state = scrollState) {
+	LazyColumn(
+		state = scrollState,
+		modifier = Modifier.background(MaterialTheme.colorScheme.background)
+	) {
 		items(products) {
 			val modifier = Modifier.padding(
 				start = 16.dp,
@@ -397,7 +444,7 @@ fun ProductItem(
 			},
 		border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outline),
 		colors = CardDefaults.cardColors(
-			containerColor = MaterialTheme.colorScheme.surfaceVariant
+			containerColor = MaterialTheme.colorScheme.surface
 		),
 		elevation = CardDefaults.cardElevation(
 			defaultElevation = 4.dp
@@ -483,7 +530,7 @@ fun FavIcon(
 				viewModel.remove(product)
 			}
 		},
-		colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.inverseOnSurface)
+		colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.secondary)
 	)
 }
 
@@ -494,7 +541,8 @@ fun FavLoader(modifier: Modifier) {
 		contentAlignment = Alignment.TopEnd
 	) {
 		CircularProgressIndicator(
-			modifier = Modifier.size(24.dp)
+			modifier = Modifier.size(24.dp),
+			color = MaterialTheme.colorScheme.secondary
 		)
 	}
 }
