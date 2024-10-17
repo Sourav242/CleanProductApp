@@ -568,7 +568,13 @@ fun ProductDetails(
 					),
 				contentScale = ContentScale.FillWidth
 			)
-			Column(modifier = Modifier.padding(all = 16.dp)) {
+			Column(
+				modifier = Modifier
+					.background(
+						color = MaterialTheme.colorScheme.background
+					)
+					.padding(all = 16.dp)
+			) {
 				Text(
 					text = product.title,
 					fontSize = 16.sp,
