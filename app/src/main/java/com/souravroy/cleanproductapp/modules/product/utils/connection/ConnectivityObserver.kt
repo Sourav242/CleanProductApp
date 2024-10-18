@@ -12,7 +12,7 @@ interface ConnectivityObserver {
 	fun observe(): Flow<NetworkStatus>
 
 	sealed class NetworkStatus(
-		val status: Boolean,
+		val status: Boolean = false,
 		val networkStatus: String? = null
 	) {
 		data object Available : NetworkStatus(true, "Available")
