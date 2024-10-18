@@ -15,10 +15,10 @@ interface ConnectivityObserver {
 		val status: Boolean,
 		val networkStatus: String? = null
 	) {
-		object Available : NetworkStatus(true, "Available")
-		object Unavailable : NetworkStatus(false, "Unavailable")
-		object Losing : NetworkStatus(false, "Losing")
-		object Lost : NetworkStatus(false, "Lost")
-		object Null : NetworkStatus(false)
+		data object Available : NetworkStatus(true, "Available")
+		data object Unavailable : NetworkStatus(false, "Unavailable")
+		data object Losing : NetworkStatus(false, "Losing")
+		data object Lost : NetworkStatus(false, "Lost")
+		data object Null : NetworkStatus(false)
 	}
 }
