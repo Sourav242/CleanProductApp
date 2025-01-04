@@ -1,6 +1,8 @@
 package com.souravroy.cleanproductapp.modules.product.view.screens
 
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -54,6 +56,16 @@ fun ProductDetailsBody(viewModel: ProductViewModel, navController: NavController
 							}) {
 								Icon(
 									painter = painterResource(id = R.drawable.baseline_bookmark_24),
+									contentDescription = stringResource(id = R.string.favourite)
+								)
+							}
+						},
+						navigationIcon = {
+							IconButton(onClick = {
+								navController?.popBackStack()
+							}) {
+								Icon(
+									Icons.AutoMirrored.Filled.ArrowBack,
 									contentDescription = stringResource(id = R.string.favourite)
 								)
 							}

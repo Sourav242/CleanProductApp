@@ -1,7 +1,11 @@
 package com.souravroy.cleanproductapp.modules.product.view.screens
 
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -49,7 +53,17 @@ fun ProductSavedBody(viewModel: ProductViewModel, navController: NavController? 
 							titleContentColor = MaterialTheme.colorScheme.onPrimary,
 							actionIconContentColor = MaterialTheme.colorScheme.onPrimary,
 							navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
-						)
+						),
+						navigationIcon = {
+							IconButton(onClick = {
+								navController?.popBackStack()
+							}) {
+								Icon(
+									Icons.AutoMirrored.Filled.ArrowBack,
+									contentDescription = stringResource(id = R.string.favourite)
+								)
+							}
+						}
 					)
 				}, snackbarHost = {
 					SnackbarHost(hostState = snackBarState)
