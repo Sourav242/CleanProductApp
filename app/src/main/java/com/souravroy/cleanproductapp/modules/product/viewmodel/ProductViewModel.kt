@@ -100,7 +100,6 @@ class ProductViewModel @Inject constructor(
 	}
 
 	fun getProduct(id: Int) = viewModelScope.launch {
-		_productResponseState.value = ResponseState.Loading()
 		repository.remote.getProduct(id)
 			.catch { error ->
 				_productResponseState.value = ResponseState.Failure(error)
@@ -108,6 +107,7 @@ class ProductViewModel @Inject constructor(
 			}.stateIn(
 				viewModelScope,
 				SharingStarted.Eagerly,
+				_productResponseState.value.data ?:
 				_productsResponseState.value.data?.find {
 					it.id == id
 				}
