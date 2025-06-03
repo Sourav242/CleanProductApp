@@ -13,9 +13,11 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import com.souravroy.cleanproductapp.R
@@ -33,12 +35,15 @@ import com.souravroy.cleanproductapp.ui.theme.CleanProductAppTheme
 @Composable
 fun ProductSavedBody(viewModel: ProductViewModel, navController: NavController? = null) {
 	val snackBarState = remember { SnackbarHostState() }
+	val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 	viewModel.getSavedProducts()
 
 	CleanProductAppTheme {
 		// A surface container using the 'background' color from the theme
 		Surface(
-			modifier = Modifier.fillMaxSize(),
+			modifier = Modifier
+				.nestedScroll(scrollBehavior.nestedScrollConnection)
+				.fillMaxSize(),
 			color = MaterialTheme.colorScheme.background
 		) {
 			Scaffold(
@@ -63,7 +68,8 @@ fun ProductSavedBody(viewModel: ProductViewModel, navController: NavController? 
 									contentDescription = stringResource(id = R.string.favourite)
 								)
 							}
-						}
+						},
+						scrollBehavior = scrollBehavior
 					)
 				}, snackbarHost = {
 					SnackbarHost(hostState = snackBarState)

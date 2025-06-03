@@ -39,6 +39,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -48,6 +49,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -88,6 +90,7 @@ private var savedProducts: List<Product> = listOf()
 @Composable
 fun ProductHomeBody(viewModel: ProductViewModel, navController: NavController? = null) {
 	val snackBarState = remember { SnackbarHostState() }
+	val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
 	CleanProductAppTheme {
 		// A surface container using the 'background' color from the theme
@@ -96,6 +99,7 @@ fun ProductHomeBody(viewModel: ProductViewModel, navController: NavController? =
 			color = MaterialTheme.colorScheme.background
 		) {
 			Scaffold(
+				modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
 				topBar = {
 					TopAppBar(
 						title = {
@@ -117,7 +121,8 @@ fun ProductHomeBody(viewModel: ProductViewModel, navController: NavController? =
 							titleContentColor = MaterialTheme.colorScheme.onPrimary,
 							actionIconContentColor = MaterialTheme.colorScheme.onPrimary,
 							navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
-						)
+						),
+						scrollBehavior = scrollBehavior
 					)
 				},
 				snackbarHost = {
@@ -580,7 +585,10 @@ fun ProductDetails(
 					fontSize = 16.sp,
 					color = MaterialTheme.colorScheme.inverseSurface
 				)
-				Text(text = product.description)
+				Text(
+					text = product.description,
+					modifier = Modifier.padding(top = 8.dp),
+				)
 
 				RatingBar(
 					rating = product.rating,
@@ -591,7 +599,9 @@ fun ProductDetails(
 					} else {
 						MaterialTheme.colorScheme.error
 					},
-					modifier = Modifier.height(14.dp)
+					modifier = Modifier
+						.padding(top = 8.dp, bottom = 8.dp)
+						.height(14.dp)
 				)
 				if (product.discountPercentage <= 0) {
 					Text(
