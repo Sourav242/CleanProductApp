@@ -220,7 +220,9 @@ fun ShowProducts(
 				productsState.value.data?.let {
 					if (it.isEmpty()) {
 						Text(
-							modifier = Modifier.fillMaxSize(),
+							modifier = Modifier
+								.fillMaxSize()
+								.padding(16.dp),
 							text = stringResource(R.string.no_products_available),
 							textAlign = TextAlign.Center
 						)
