@@ -19,7 +19,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -118,9 +118,10 @@ fun ProductHomeBody(viewModel: ProductViewModel, navController: NavController? =
 						colors = TopAppBarColors(
 							containerColor = MaterialTheme.colorScheme.primary,
 							scrolledContainerColor = MaterialTheme.colorScheme.primary,
+                            navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
 							titleContentColor = MaterialTheme.colorScheme.onPrimary,
 							actionIconContentColor = MaterialTheme.colorScheme.onPrimary,
-							navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                            subtitleContentColor = MaterialTheme.colorScheme.onPrimary
 						),
 						scrollBehavior = scrollBehavior
 					)
@@ -158,10 +159,10 @@ fun ProductBody(
 	viewModel.productUiModel.remote = remote
 	Column(
 		modifier = Modifier
-			.padding(contentPadding)
-			.background(
-				color = MaterialTheme.colorScheme.primary
-			)
+            .padding(contentPadding)
+            .background(
+                color = MaterialTheme.colorScheme.primary
+            )
 	) {
 
 		val networkStatus by viewModel.connectivityObserver.observe()
@@ -221,8 +222,8 @@ fun ShowProducts(
 					if (it.isEmpty()) {
 						Text(
 							modifier = Modifier
-								.fillMaxSize()
-								.padding(16.dp),
+                                .fillMaxSize()
+                                .padding(16.dp),
 							text = stringResource(R.string.no_products_available),
 							textAlign = TextAlign.Center
 						)
@@ -280,10 +281,10 @@ fun ShowNetworkError(
 
 	Column(
 		modifier = Modifier
-			.fillMaxSize()
-			.background(
-				color = MaterialTheme.colorScheme.background
-			),
+            .fillMaxSize()
+            .background(
+                color = MaterialTheme.colorScheme.background
+            ),
 		verticalArrangement = Arrangement.Center,
 		horizontalAlignment = Alignment.CenterHorizontally
 	) {
@@ -314,34 +315,35 @@ fun ShowNetworkError(
 fun Decoration() {
 	Box(
 		modifier = Modifier
-			.fillMaxWidth()
-			.height(16.dp)
-			.background(
-				brush = Brush.verticalGradient(
-					colors = listOf(
-						colorResource(id = R.color.shadow_color_1),
-						colorResource(id = R.color.shadow_color_2),
-						colorResource(id = android.R.color.transparent)
-					)
-				)
-			)
+            .fillMaxWidth()
+            .height(16.dp)
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        colorResource(id = R.color.shadow_color_1),
+                        colorResource(id = R.color.shadow_color_2),
+                        colorResource(id = android.R.color.transparent)
+                    )
+                )
+            )
 	)
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchBody(viewModel: ProductViewModel) {
 	val inputValue =
 		remember { mutableStateOf(TextFieldValue(viewModel.productUiModel.searchText)) }
 	Card(
 		modifier = Modifier
-			.padding(
-				start = 16.dp,
-				end = 16.dp,
-				bottom = 16.dp
-			)
-			.background(
-				color = MaterialTheme.colorScheme.primary
-			),
+            .padding(
+                start = 16.dp,
+                end = 16.dp,
+                bottom = 16.dp
+            )
+            .background(
+                color = MaterialTheme.colorScheme.primary
+            ),
 		border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outline),
 		colors = CardDefaults.cardColors(
 			containerColor = MaterialTheme.colorScheme.surfaceVariant
@@ -364,14 +366,14 @@ fun SearchBody(viewModel: ProductViewModel) {
 				},
 				leadingIcon = {
 					Icon(
-						Icons.Default.Search,
+                        Icons.Filled.Search,
 						contentDescription = stringResource(R.string.search_products)
 					)
 				},
 				trailingIcon = {
 					if (inputValue.value.text.isNotEmpty()) {
 						Icon(
-							Icons.Default.Clear,
+                            Icons.Filled.Close,
 							contentDescription = stringResource(R.string.clear_text),
 							modifier = Modifier
 								.clickable {
@@ -559,7 +561,8 @@ fun ProductDetails(
 	product: Product,
 	viewModel: ProductViewModel,
 	contentPadding: PaddingValues = PaddingValues(0.dp),
-	snackBarState: SnackbarHostState
+    snackBarState: SnackbarHostState,
+    isFromDetailsScreen: Boolean = false
 ) {
 	Box(
 		modifier = Modifier.padding(contentPadding)
@@ -569,28 +572,30 @@ fun ProductDetails(
 				model = product.thumbnail,
 				contentDescription = null,
 				modifier = Modifier
-					.fillMaxWidth()
-					.wrapContentHeight(
-						align = Alignment.CenterVertically
-					),
+                    .fillMaxWidth()
+                    .wrapContentHeight(
+                        align = Alignment.CenterVertically
+                    ),
 				contentScale = ContentScale.FillWidth
 			)
 			Column(
 				modifier = Modifier
-					.background(
-						color = MaterialTheme.colorScheme.background
-					)
-					.padding(all = 16.dp)
+                    .background(
+                        color = MaterialTheme.colorScheme.background
+                    )
+                    .padding(all = 16.dp)
 			) {
 				Text(
 					text = product.title,
 					fontSize = 16.sp,
 					color = MaterialTheme.colorScheme.inverseSurface
 				)
-				Text(
-					text = product.description,
-					modifier = Modifier.padding(top = 8.dp),
-				)
+                if (isFromDetailsScreen) {
+                    Text(
+                        text = product.description,
+                        modifier = Modifier.padding(top = 8.dp),
+                    )
+                }
 
 				RatingBar(
 					rating = product.rating,
@@ -602,8 +607,8 @@ fun ProductDetails(
 						MaterialTheme.colorScheme.error
 					},
 					modifier = Modifier
-						.padding(top = 8.dp, bottom = 8.dp)
-						.height(14.dp)
+                        .padding(top = 8.dp, bottom = 8.dp)
+                        .height(14.dp)
 				)
 				if (product.discountPercentage <= 0) {
 					Text(
@@ -678,8 +683,8 @@ fun ProductDetails(
 		}
 		Favourite(
 			modifier = Modifier
-				.align(Alignment.TopEnd)
-				.padding(all = 16.dp),
+                .align(Alignment.TopEnd)
+                .padding(all = 16.dp),
 			product = product,
 			viewModel = viewModel,
 			snackBarState = snackBarState

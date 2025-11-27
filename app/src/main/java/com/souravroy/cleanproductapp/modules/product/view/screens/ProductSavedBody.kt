@@ -2,7 +2,7 @@ package com.souravroy.cleanproductapp.modules.product.view.screens
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -42,8 +42,8 @@ fun ProductSavedBody(viewModel: ProductViewModel, navController: NavController? 
 		// A surface container using the 'background' color from the theme
 		Surface(
 			modifier = Modifier
-				.nestedScroll(scrollBehavior.nestedScrollConnection)
-				.fillMaxSize(),
+                .nestedScroll(scrollBehavior.nestedScrollConnection)
+                .fillMaxSize(),
 			color = MaterialTheme.colorScheme.background
 		) {
 			Scaffold(
@@ -64,7 +64,7 @@ fun ProductSavedBody(viewModel: ProductViewModel, navController: NavController? 
 								navController?.popBackStack()
 							}) {
 								Icon(
-									Icons.AutoMirrored.Filled.ArrowBack,
+                                    Icons.Filled.ArrowBack,
 									contentDescription = stringResource(id = R.string.favourite)
 								)
 							}

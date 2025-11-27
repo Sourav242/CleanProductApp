@@ -1,29 +1,28 @@
+@file:OptIn(ExperimentalCoroutinesApi::class)
 package com.souravroy.cleanproductapp.modules.product.viewmodel
 
-import android.arch.core.executor.testing.InstantTaskExecutorRule
 import android.content.Context
-import androidx.test.platform.app.InstrumentationRegistry
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.test.core.app.ApplicationProvider
 import com.souravroy.cleanproductapp.base.model.ResponseModel
-import com.souravroy.cleanproductapp.base.test.BaseTest
+import com.souravroy.cleanproductapp.base.model.ResponseState
+import com.souravroy.cleanproductapp.base.test.MainCoroutineRule
 import com.souravroy.cleanproductapp.modules.product.model.Product
 import com.souravroy.cleanproductapp.modules.product.repository.ProductRepository
 import io.mockk.MockKAnnotations
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
-import io.mockk.mockk
-import io.mockk.spyk
-import junit.framework.TestCase.assertEquals
-import kotlinx.coroutines.Dispatchers
+import io.mockk.impl.annotations.RelaxedMockK
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import org.junit.After
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
+import org.junit.runner.RunWith
+import org.junit.runners.JUnit4
 
 /**
  * @Author: Sourav Roy
@@ -31,41 +30,37 @@ import org.junit.jupiter.api.BeforeEach
  * @Date: 24-09-2023
  */
 
-class ProductViewModelTest : BaseTest() {
+@RunWith(JUnit4::class)
+class ProductViewModelTest {
 
 	@get:Rule
-	val instanceTaskExecutor = InstantTaskExecutorRule()
+    val instantTaskExecutorRule = InstantTaskExecutorRule()
 
 	@get:Rule
 	val mainCoroutineRule = MainCoroutineRule()
 
-	private var repository: ProductRepository = mockk(relaxed = true)
+    @RelaxedMockK
+    private lateinit var repository: ProductRepository
 
-    private val context: Context = InstrumentationRegistry.getInstrumentation().targetContext
+    private val context: Context = ApplicationProvider.getApplicationContext()
 
 	private lateinit var viewModel: ProductViewModel
-
-	@BeforeEach
-	override fun beforeEach() {
-		super.beforeEach()
-	}
-
-	@AfterEach
-	override fun afterEach() {
-		super.afterEach()
-		clearAllMocks()
-	}
 
 	@Before
 	fun setup() {
 		MockKAnnotations.init(this, relaxed = true)
-        viewModel = spyk(ProductViewModel(repository, context))
+        viewModel = ProductViewModel(repository, context)
+    }
+
+    @After
+    fun tearDown() {
+        clearAllMocks()
 	}
 
 	@Test
-	fun testGetProducts() = runTest {
+    fun getProductsShouldEmitSuccess() = runTest {
 		val mockResponse = Product(
-			0, "", "", 0, 0.0, 0.0, 0, "", "laptops", "", listOf()
+            0, "", "", 0.0, 0.0, 0.0, 0, "", "laptops", "", listOf()
 		)
 		coEvery {
 			repository.remote.getProducts()
@@ -74,15 +69,15 @@ class ProductViewModelTest : BaseTest() {
 		viewModel.getProducts("lap")
 
 		assertEquals(
-			listOf(mockResponse)[0].category,
+            mockResponse.category,
 			viewModel.productsResponseState.value.data?.get(0)?.category
 		)
 	}
 
 	@Test
-	fun testGetProduct() = runTest {
+    fun getProductShouldEmitSuccess() = runTest {
 		val mockResponse = Product(
-			1, "", "", 0, 0.0, 0.0, 0, "", "laptops", "", listOf()
+            1, "", "", 0.0, 0.0, 0.0, 0, "", "laptops", "", listOf()
 		)
 		coEvery {
 			repository.remote.getProduct(1)
@@ -94,9 +89,9 @@ class ProductViewModelTest : BaseTest() {
 	}
 
 	@Test
-	fun testGetSavedProducts() = runTest {
+    fun getSavedProductsShouldEmitSuccess() = runTest {
 		val mockResponse = Product(
-			0, "", "", 0, 0.0, 0.0, 0, "", "laptops", "", listOf()
+            0, "", "", 0.0, 0.0, 0.0, 0, "", "laptops", "", listOf()
 		)
 		coEvery {
 			repository.local.getProducts()
@@ -105,15 +100,15 @@ class ProductViewModelTest : BaseTest() {
 		viewModel.getSavedProducts("lap")
 
 		assertEquals(
-			listOf(mockResponse)[0].category,
+            mockResponse.category,
 			viewModel.productsSavedResponseState.value.data?.get(0)?.category
 		)
 	}
 
 	@Test
-	fun testGetSavedProduct() = runTest {
+    fun getSavedProductShouldEmitSuccess() = runTest {
 		val mockResponse = Product(
-			1, "", "", 0, 0.0, 0.0, 0, "", "laptops", "", listOf()
+            1, "", "", 0.0, 0.0, 0.0, 0, "", "laptops", "", listOf()
 		)
 		coEvery {
 			repository.local.getProduct(1)
@@ -125,9 +120,9 @@ class ProductViewModelTest : BaseTest() {
 	}
 
 	@Test
-	fun testSave() = runTest {
+    fun saveShouldEmitSuccess() = runTest {
 		val mockRequest = Product(
-			1, "", "", 0, 0.0, 0.0, 0, "", "laptops", "", listOf()
+            1, "", "", 0.0, 0.0, 0.0, 0, "", "laptops", "", listOf()
 		)
 		coEvery {
 			repository.local.save(mockRequest)
@@ -135,13 +130,13 @@ class ProductViewModelTest : BaseTest() {
 
 		viewModel.save(mockRequest)
 
-		assertEquals(1L, viewModel.productSavedState.value.data)
+        assertEquals(ResponseState.Success(mockRequest), viewModel.productSavedState.value)
 	}
 
 	@Test
-	fun testRemove() = runTest {
+    fun removeShouldEmitSuccess() = runTest {
 		val mockRequest = Product(
-			1, "", "", 0, 0.0, 0.0, 0, "", "laptops", "", listOf()
+            1, "", "", 0.0, 0.0, 0.0, 0, "", "laptops", "", listOf()
 		)
 		coEvery {
 			repository.local.remove(mockRequest)
@@ -149,12 +144,6 @@ class ProductViewModelTest : BaseTest() {
 
 		viewModel.remove(mockRequest)
 
-		assertEquals(1, viewModel.productSavedState.value.data)
-	}
-
-	@OptIn(ExperimentalCoroutinesApi::class)
-	@After
-	fun tearDown() {
-		Dispatchers.resetMain()
+        assertEquals(ResponseState.Success(mockRequest), viewModel.productSavedState.value)
 	}
 }

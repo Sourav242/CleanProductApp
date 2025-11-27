@@ -2,7 +2,7 @@ package com.souravroy.cleanproductapp.modules.product.view.screens
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -12,6 +12,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -65,11 +66,19 @@ fun ProductDetailsBody(viewModel: ProductViewModel, navController: NavController
 								navController?.popBackStack()
 							}) {
 								Icon(
-									Icons.AutoMirrored.Filled.ArrowBack,
+                                    Icons.Filled.ArrowBack,
 									contentDescription = stringResource(id = R.string.favourite)
 								)
 							}
-						}
+                        },
+                        colors = TopAppBarColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            scrolledContainerColor = MaterialTheme.colorScheme.primary,
+                            navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                            titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                            actionIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                            subtitleContentColor = MaterialTheme.colorScheme.onPrimary
+                        ),
 					)
 				},
 				snackbarHost = {
@@ -105,7 +114,7 @@ fun ProductDetailsBody(viewModel: ProductViewModel, navController: NavController
 				when (productState.value) {
 					is ResponseState.Success -> {
 						productState.value.data?.let {
-							ProductDetails(it, viewModel, contentPadding, snackBarState)
+                            ProductDetails(it, viewModel, contentPadding, snackBarState, true)
 						}
 					}
 
