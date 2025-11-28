@@ -32,7 +32,7 @@ class ProductRepositoryTest {
     }
 
     @Test
-    fun `get products should emit success`() = runTest {
+    fun getProductsShouldEmitSuccess() = runTest {
         // GIVEN
         val products = listOf(
             Product(

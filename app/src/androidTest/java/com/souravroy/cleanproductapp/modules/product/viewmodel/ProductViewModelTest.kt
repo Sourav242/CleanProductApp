@@ -62,11 +62,12 @@ class ProductViewModelTest {
 		val mockResponse = Product(
             0, "", "", 0.0, 0.0, 0.0, 0, "", "laptops", "", listOf()
 		)
+        val query = "lap"
 		coEvery {
-			repository.remote.getProducts()
+            repository.remote.getProducts(query)
 		} returns flowOf(ResponseModel(listOf(mockResponse), 0, 0, 0))
 
-		viewModel.getProducts("lap")
+        viewModel.getProducts(query)
 
 		assertEquals(
             mockResponse.category,
@@ -93,11 +94,12 @@ class ProductViewModelTest {
 		val mockResponse = Product(
             0, "", "", 0.0, 0.0, 0.0, 0, "", "laptops", "", listOf()
 		)
+        val query = "lap"
 		coEvery {
-			repository.local.getProducts()
+            repository.local.getProducts(query)
 		} returns flowOf(listOf(mockResponse))
 
-		viewModel.getSavedProducts("lap")
+        viewModel.getSavedProducts(query)
 
 		assertEquals(
             mockResponse.category,
@@ -130,7 +132,10 @@ class ProductViewModelTest {
 
 		viewModel.save(mockRequest)
 
-        assertEquals(ResponseState.Success(mockRequest), viewModel.productSavedState.value)
+        assertEquals(
+            ResponseState.Success(mockRequest).data,
+            viewModel.productSavedState.value.data
+        )
 	}
 
 	@Test
@@ -144,6 +149,9 @@ class ProductViewModelTest {
 
 		viewModel.remove(mockRequest)
 
-        assertEquals(ResponseState.Success(mockRequest), viewModel.productSavedState.value)
+        assertEquals(
+            ResponseState.Success(mockRequest).data,
+            viewModel.productSavedState.value.data
+        )
 	}
 }

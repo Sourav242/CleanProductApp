@@ -100,6 +100,7 @@ class ProductViewModel @Inject constructor(
 	}
 
 	fun getProduct(id: Int) = viewModelScope.launch {
+        _productResponseState.value = ResponseState.Loading()
 		repository.remote.getProduct(id)
 			.catch { error ->
 				_productResponseState.value = ResponseState.Failure(error)
