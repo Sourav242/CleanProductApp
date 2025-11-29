@@ -38,7 +38,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -115,13 +114,12 @@ fun ProductHomeBody(viewModel: ProductViewModel, navController: NavController? =
 								)
 							}
 						},
-						colors = TopAppBarColors(
+                        colors = TopAppBarDefaults.topAppBarColors(
 							containerColor = MaterialTheme.colorScheme.primary,
 							scrolledContainerColor = MaterialTheme.colorScheme.primary,
+                            titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                            actionIconContentColor = MaterialTheme.colorScheme.onPrimary,
                             navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
-							titleContentColor = MaterialTheme.colorScheme.onPrimary,
-							actionIconContentColor = MaterialTheme.colorScheme.onPrimary,
-                            subtitleContentColor = MaterialTheme.colorScheme.onPrimary
 						),
 						scrollBehavior = scrollBehavior
 					)
@@ -459,7 +457,7 @@ fun ProductItem(
 			defaultElevation = 4.dp
 		)
 	) {
-		ProductDetails(product, viewModel = viewModel, snackBarState = snackBarState)
+        ProductListDetails(product, viewModel = viewModel, snackBarState = snackBarState)
 	}
 }
 
@@ -557,108 +555,104 @@ fun FavLoader(modifier: Modifier) {
 }
 
 @Composable
-fun ProductDetails(
+fun ProductListDetails(
 	product: Product,
 	viewModel: ProductViewModel,
 	contentPadding: PaddingValues = PaddingValues(0.dp),
-    snackBarState: SnackbarHostState,
-    isFromDetailsScreen: Boolean = false
+    snackBarState: SnackbarHostState
 ) {
 	Box(
 		modifier = Modifier.padding(contentPadding)
 	) {
-		Column {
-			AsyncImage(
-				model = product.thumbnail,
-				contentDescription = null,
-				modifier = Modifier
-                    .fillMaxWidth()
+        Row(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            AsyncImage(
+                model = product.thumbnail,
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxWidth(0.4f)
                     .wrapContentHeight(
                         align = Alignment.CenterVertically
                     ),
-				contentScale = ContentScale.FillWidth
-			)
-			Column(
-				modifier = Modifier
+                contentScale = ContentScale.Inside,
+            )
+            Column(
+                modifier = Modifier
                     .background(
                         color = MaterialTheme.colorScheme.background
                     )
                     .padding(all = 16.dp)
-			) {
-				Text(
-					text = product.title,
-					fontSize = 16.sp,
-					color = MaterialTheme.colorScheme.inverseSurface
-				)
-                if (isFromDetailsScreen) {
-                    Text(
-                        text = product.description,
-                        modifier = Modifier.padding(top = 8.dp),
-                    )
-                }
+            ) {
+                Text(
+                    text = product.title,
+                    fontSize = 16.sp,
+                    color = MaterialTheme.colorScheme.inverseSurface
+                )
 
-				RatingBar(
-					rating = product.rating,
-					color = if (product.rating > 4) {
-						MaterialTheme.colorScheme.success
-					} else if (product.rating > 2) {
-						MaterialTheme.colorScheme.warning
-					} else {
-						MaterialTheme.colorScheme.error
-					},
-					modifier = Modifier
+                RatingBar(
+                    rating = product.rating,
+                    color = if (product.rating > 4) {
+                        MaterialTheme.colorScheme.success
+                    } else if (product.rating > 2) {
+                        MaterialTheme.colorScheme.warning
+                    } else {
+                        MaterialTheme.colorScheme.error
+                    },
+                    modifier = Modifier
                         .padding(top = 8.dp, bottom = 8.dp)
                         .height(14.dp)
-				)
-				if (product.discountPercentage <= 0) {
-					Text(
-						text = "Price - $${
-							String.format(
-								Locale.getDefault(),
-								"%.2f",
-								product.price
-							)
-						}",
-						modifier = Modifier.padding(start = 8.dp)
-					)
-				} else {
-					Row(
-						verticalAlignment = Alignment.CenterVertically
-					) {
-						Text(
-							text = "-${product.discountPercentage}%",
-							color = MaterialTheme.colorScheme.error,
-							fontSize = 16.sp
-						)
-						Text(
-							text = "$${product.price + (product.price * product.discountPercentage / 100).toInt()}",
-							modifier = Modifier.padding(start = 8.dp),
-							style = TextStyle(textDecoration = TextDecoration.LineThrough),
-							color = MaterialTheme.colorScheme.outline
-						)
-						Text(
-							text = "$${product.price}",
-							modifier = Modifier.padding(start = 8.dp),
-							fontSize = 16.sp,
-							color = MaterialTheme.colorScheme.inverseSurface
-						)
-					}
-				}
-				if (product.stock == 1) {
-					Text(
-						text = "Hurry up stock's last",
-						color = MaterialTheme.colorScheme.warning,
-						fontSize = 12.sp
-					)
-				} else if (product.stock < 10) {
-					Text(
-						text = "Hurry up only ${product.stock} left",
-						color = MaterialTheme.colorScheme.warning,
-						fontSize = 12.sp
-					)
-				}
-			}
-		}
+                )
+                if (product.discountPercentage <= 0) {
+                    Text(
+                        text = "Price - $${
+                            String.format(
+                                Locale.getDefault(),
+                                "%.2f",
+                                product.price
+                            )
+                        }",
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                } else {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "-${product.discountPercentage}%",
+                            color = MaterialTheme.colorScheme.error,
+                            fontSize = 16.sp
+                        )
+                        Text(
+                            text = "$${product.price + (product.price * product.discountPercentage / 100).toInt()}",
+                            modifier = Modifier.padding(start = 8.dp),
+                            style = TextStyle(textDecoration = TextDecoration.LineThrough),
+                            color = MaterialTheme.colorScheme.outline
+                        )
+                        Text(
+                            text = "$${product.price}",
+                            modifier = Modifier.padding(start = 8.dp),
+                            fontSize = 16.sp,
+                            color = MaterialTheme.colorScheme.inverseSurface
+                        )
+                    }
+                }
+                if (product.stock == 1) {
+                    Text(
+                        text = "Hurry up stock\'s last",
+                        color = MaterialTheme.colorScheme.warning,
+                        fontSize = 12.sp
+                    )
+                } else if (product.stock < 10) {
+                    Text(
+                        text = "Hurry up only ${product.stock} left",
+                        color = MaterialTheme.colorScheme.warning,
+                        fontSize = 12.sp
+                    )
+                }
+            }
+        }
+
 		Box(
 			modifier = Modifier.background(
 				brush = Brush.horizontalGradient(
