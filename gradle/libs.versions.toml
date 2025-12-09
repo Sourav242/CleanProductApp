@@ -81,7 +81,6 @@ test-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-
 androidTest-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidxTestExtJunit" }
 androidTest-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 androidTest-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
-androidTest-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
 androidTest-junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junitJupiter" }
 androidTest-mockk-android = { group = "io.mockk", name = "mockk-android", version.ref = "mockkAndroid" }
 androidTest-arch-core-testing = { group = "android.arch.core", name = "core-testing", version.ref = "coreTesting" }
