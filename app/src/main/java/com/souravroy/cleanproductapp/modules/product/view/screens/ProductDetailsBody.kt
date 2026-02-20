@@ -137,7 +137,7 @@ fun ProductDetailsBody(viewModel: ProductViewModel, navController: NavController
 				when (productState.value) {
 					is ResponseState.Success -> {
 						productState.value.data?.let {
-                            ProductDetails(it, viewModel, contentPadding, snackBarState)
+							ProductDetails(it, viewModel, contentPadding, snackBarState, true)
 						}
 					}
 
@@ -159,7 +159,8 @@ fun ProductDetails(
     product: Product,
     viewModel: ProductViewModel,
     contentPadding: PaddingValues = PaddingValues(0.dp),
-    snackBarState: SnackbarHostState
+	snackBarState: SnackbarHostState,
+	productDetailsView: Boolean = false
 ) {
     Box(
         modifier = Modifier.padding(contentPadding)
@@ -169,18 +170,18 @@ fun ProductDetails(
                 model = product.thumbnail,
                 contentDescription = null,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight(
-                        align = Alignment.CenterVertically
-                    ),
+					.fillMaxWidth()
+					.wrapContentHeight(
+						align = Alignment.CenterVertically
+					),
                 contentScale = ContentScale.FillWidth
             )
             Column(
                 modifier = Modifier
-                    .background(
-                        color = MaterialTheme.colorScheme.background
-                    )
-                    .padding(all = 16.dp)
+					.background(
+						color = MaterialTheme.colorScheme.background
+					)
+					.padding(all = 16.dp)
             ) {
                 Text(
                     text = product.title,
@@ -216,20 +217,33 @@ fun ProductDetails(
                     Row(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(
-                            text = "-${product.discountPercentage}%",
-                            color = MaterialTheme.colorScheme.error,
-                            fontSize = 20.sp
-                        )
+						if (productDetailsView) {
+							Text(
+								text = "-${product.discountPercentage}%",
+								color = MaterialTheme.colorScheme.error,
+								fontSize = 20.sp,
+								modifier = Modifier.padding(
+									start = 0.dp,
+									end = 8.dp,
+									top = 0.dp,
+									bottom = 0.dp
+								)
+							)
+						}
                         Text(
                             text = "$${product.price + (product.price * product.discountPercentage / 100).toInt()}",
-                            modifier = Modifier.padding(start = 8.dp),
+							modifier = Modifier.padding(
+								start = 0.dp,
+								end = 8.dp,
+								top = 0.dp,
+								bottom = 0.dp
+							),
+							fontSize = 14.sp,
                             style = TextStyle(textDecoration = TextDecoration.LineThrough),
                             color = MaterialTheme.colorScheme.outline
                         )
                         Text(
                             text = "$${product.price}",
-                            modifier = Modifier.padding(start = 8.dp),
                             fontSize = 20.sp,
                             color = MaterialTheme.colorScheme.inverseSurface
                         )
@@ -248,10 +262,12 @@ fun ProductDetails(
                         fontSize = 12.sp
                     )
                 }
-                Text(
-                    text = product.description,
-                    modifier = Modifier.padding(top = 8.dp),
-                )
+				if (productDetailsView) {
+					Text(
+						text = product.description,
+						modifier = Modifier.padding(top = 8.dp),
+					)
+				}
             }
         }
 
