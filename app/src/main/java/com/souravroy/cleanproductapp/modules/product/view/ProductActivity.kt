@@ -1,14 +1,19 @@
 package com.souravroy.cleanproductapp.modules.product.view
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.core.content.ContextCompat
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -39,6 +44,32 @@ class ProductActivity : ComponentActivity() {
 				composable(PRODUCT_HOME) { ProductHomeBody(viewModel, navController) }
 				composable(PRODUCT_DETAILS) { ProductDetailsBody(viewModel, navController) }
 				composable(PRODUCT_SAVED) { ProductSavedBody(viewModel, navController) }
+			}
+		}
+		askNotificationPermission()
+	}
+
+	// Declare the launcher at the top of your Activity/Fragment:
+	private val requestPermissionLauncher = registerForActivityResult(
+		ActivityResultContracts.RequestPermission(),
+	) { isGranted: Boolean ->
+		if (isGranted) {
+			// FCM SDK (and your app) can post notifications.
+		} else {
+			// TODO: Inform user that that your app will not show notifications.
+		}
+	}
+
+	private fun askNotificationPermission() {
+		// This is only necessary for API level >= 33 (TIRAMISU)
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+			if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
+				PackageManager.PERMISSION_GRANTED
+			) {
+				// FCM SDK (and your app) can post notifications.
+			} else {
+				// Directly ask for the permission
+				requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
 			}
 		}
 	}

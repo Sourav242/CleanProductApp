@@ -7,6 +7,8 @@ plugins {
     alias(libs.plugins.navigationSafeargs)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
+    id("de.mannodermaus.android-junit5")
+    alias(libs.plugins.googleGmsGoogleServices)
 }
 android {
 	namespace = "com.souravroy.cleanproductapp"
@@ -14,12 +16,13 @@ android {
 
 	defaultConfig {
 		applicationId = "com.souravroy.cleanproductapp"
-		minSdk = 24
+        minSdk = 26
         targetSdk = 36
 		versionCode = 1
 		versionName = "1.0"
 
-		testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner =
+            "de.mannodermaus.junit5.provider.instrumentation.AndroidJUnitTestRunner"
 		vectorDrawables {
 			useSupportLibrary = true
 		}
@@ -39,11 +42,12 @@ android {
 		}
 	}
 	compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        isCoreLibraryDesugaringEnabled = true
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
 	}
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
 	buildFeatures {
 		compose = true
@@ -56,6 +60,10 @@ android {
 		}
 	}
 	testOptions {
+        unitTests {
+            isReturnDefaultValues = true
+            isIncludeAndroidResources = true
+        }
 		packaging {
 			jniLibs {
 				useLegacyPackaging = true
@@ -92,6 +100,8 @@ dependencies {
 	//hilt
     implementation(libs.hilt.android)
     implementation(libs.hilt.navigation.compose)
+    implementation(libs.firebase.messaging)
+    implementation(libs.androidx.compose.runtime)
     ksp(libs.hilt.compiler)
 
 	//retrofit
@@ -109,15 +119,18 @@ dependencies {
 	//mockK
     testImplementation(libs.test.mockk)
     testImplementation(libs.test.turbine)
-    androidTestImplementation(libs.androidTest.junit.jupiter)
     androidTestImplementation(libs.androidTest.mockk.android)
     androidTestImplementation(libs.androidTest.arch.core.testing)
+    androidTestImplementation(libs.test.turbine)
 
-    testImplementation(libs.test.junit)
-    androidTestImplementation(libs.androidTest.junit)
+    androidTestImplementation(libs.androidTest.jupiter.api)
+    androidTestImplementation(libs.androidTest.jupiter.params)
     androidTestImplementation(libs.androidTest.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidTest.compose.ui.test.junit4)
     debugImplementation(libs.debug.compose.ui.tooling)
     debugImplementation(libs.debug.compose.ui.test.manifest)
+    androidTestRuntimeOnly(libs.androidTest.jupiter.engine)
+    androidTestRuntimeOnly(libs.androidTest.junit.platform.runner)
+
+    coreLibraryDesugaring(libs.desugarJdkLibs)
 }

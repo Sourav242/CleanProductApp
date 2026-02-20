@@ -1,7 +1,7 @@
 [versions]
-agp = "8.13.2"
+agp = "9.0.1"
 kotlin = "2.2.21"
-ksp = "2.2.21-2.0.4"
+ksp = "2.3.2"
 composeCompiler = "2.2.21"
 nav = "2.9.6"
 hilt = "2.57.2"
@@ -16,16 +16,21 @@ foundationAndroid = "1.10.0"
 uiViewbinding = "1.10.0"
 coil = "2.7.0"
 hiltNavigationCompose = "1.3.0"
+desugarJdkLibs = "2.1.5"
+junitPlatformRunner = "1.10.3"
 
 # Testing
 mockk = "1.14.7"
 mockkAndroid = "1.14.7"
 turbine = "1.2.1"
-junitJupiter = "6.0.1"
+junitJupiter = "6.0.3"
 coreTesting = "1.1.1"
 junit = "4.13.2"
 androidxTestExtJunit = "1.3.0"
 espressoCore = "3.7.0"
+googleGmsGoogleServices = "4.4.4"
+firebaseMessaging = "25.0.1"
+runtime = "1.10.3"
 
 [libraries]
 # Core & Lifecycle
@@ -70,6 +75,8 @@ androidx-room-runtime = { group = "androidx.room", name = "room-runtime", versio
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 
+desugarJdkLibs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "desugarJdkLibs" }
+
 # Testing
 # Unit
 test-junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -81,13 +88,18 @@ test-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-
 androidTest-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidxTestExtJunit" }
 androidTest-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 androidTest-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
-androidTest-junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junitJupiter" }
+androidTest-jupiter-api = { group = "org.junit.jupiter", name = "junit-jupiter-api", version.ref = "junitJupiter" }
+androidTest-jupiter-params = { group = "org.junit.jupiter", name = "junit-jupiter-params", version.ref = "junitJupiter" }
+androidTest-jupiter-engine = { group = "org.junit.jupiter", name = "junit-jupiter-engine", version.ref = "junitJupiter" }
+androidTest-junit-platform-runner = { group = "org.junit.platform", name = "junit-platform-runner", version.ref = "junitPlatformRunner" }
 androidTest-mockk-android = { group = "io.mockk", name = "mockk-android", version.ref = "mockkAndroid" }
 androidTest-arch-core-testing = { group = "android.arch.core", name = "core-testing", version.ref = "coreTesting" }
 
 # Debug
 debug-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 debug-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
+firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging", version.ref = "firebaseMessaging" }
+androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "runtime" }
 
 [bundles]
 lifecycle = ["androidx-lifecycle-livedata-ktx", "androidx-lifecycle-runtime-compose", "androidx-lifecycle-viewmodel-compose"]
@@ -103,3 +115,4 @@ kotlinCompose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "com
 navigationSafeargs = { id = "androidx.navigation.safeargs", version.ref = "nav" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+googleGmsGoogleServices = { id = "com.google.gms.google-services", version.ref = "googleGmsGoogleServices" }

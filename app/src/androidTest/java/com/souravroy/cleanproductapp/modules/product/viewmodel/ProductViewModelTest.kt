@@ -1,11 +1,9 @@
-@file:OptIn(ExperimentalCoroutinesApi::class)
 package com.souravroy.cleanproductapp.modules.product.viewmodel
 
 import android.content.Context
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.core.app.ApplicationProvider
+import app.cash.turbine.test
 import com.souravroy.cleanproductapp.base.model.ResponseModel
-import com.souravroy.cleanproductapp.base.model.ResponseState
 import com.souravroy.cleanproductapp.base.test.MainCoroutineRule
 import com.souravroy.cleanproductapp.modules.product.model.Product
 import com.souravroy.cleanproductapp.modules.product.repository.ProductRepository
@@ -16,25 +14,14 @@ import io.mockk.impl.annotations.RelaxedMockK
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import org.junit.After
-import org.junit.Assert.assertEquals
-import org.junit.Before
 import org.junit.Rule
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 
-/**
- * @Author: Sourav Roy
- * @Email: 1994sourav@gmail.com
- * @Date: 24-09-2023
- */
-
-@RunWith(JUnit4::class)
+@ExperimentalCoroutinesApi
 class ProductViewModelTest {
-
-	@get:Rule
-    val instantTaskExecutorRule = InstantTaskExecutorRule()
 
 	@get:Rule
 	val mainCoroutineRule = MainCoroutineRule()
@@ -46,37 +33,43 @@ class ProductViewModelTest {
 
 	private lateinit var viewModel: ProductViewModel
 
-	@Before
+	@BeforeEach
 	fun setup() {
 		MockKAnnotations.init(this, relaxed = true)
         viewModel = ProductViewModel(repository, context)
     }
 
-    @After
+	@AfterEach
     fun tearDown() {
         clearAllMocks()
 	}
 
 	@Test
-    fun getProductsShouldEmitSuccess() = runTest {
-		val mockResponse = Product(
+	fun getProducts() = runTest {
+		val mockProduct = Product(
             0, "", "", 0.0, 0.0, 0.0, 0, "", "laptops", "", listOf()
 		)
+		val mockResponse = ResponseModel(listOf(mockProduct), 0, 0, 0)
         val query = "lap"
 		coEvery {
             repository.remote.getProducts(query)
-		} returns flowOf(ResponseModel(listOf(mockResponse), 0, 0, 0))
+		} returns flowOf(mockResponse)
 
         viewModel.getProducts(query)
 
-		assertEquals(
-            mockResponse.category,
-			viewModel.productsResponseState.value.data?.get(0)?.category
-		)
+		viewModel.productsResponseState.test {
+			awaitItem() // Consume the initial Loading state
+			val result = awaitItem() // Consume the success state
+			assertEquals(
+				mockProduct.category,
+				result.data?.get(0)?.category
+			)
+			cancelAndIgnoreRemainingEvents()
+		}
 	}
 
 	@Test
-    fun getProductShouldEmitSuccess() = runTest {
+	fun getProduct() = runTest {
 		val mockResponse = Product(
             1, "", "", 0.0, 0.0, 0.0, 0, "", "laptops", "", listOf()
 		)
@@ -86,29 +79,39 @@ class ProductViewModelTest {
 
 		viewModel.getProduct(1)
 
-		assertEquals(mockResponse.id, viewModel.productResponseState.value.data?.id)
+		viewModel.productResponseState.test {
+			awaitItem() // Consume the initial Loading state
+			val result = awaitItem() // Consume the success state
+			assertEquals(mockResponse.id, result.data?.id)
+			cancelAndIgnoreRemainingEvents()
+		}
 	}
 
 	@Test
-    fun getSavedProductsShouldEmitSuccess() = runTest {
-		val mockResponse = Product(
+	fun getSavedProducts() = runTest {
+		val mockProduct = Product(
             0, "", "", 0.0, 0.0, 0.0, 0, "", "laptops", "", listOf()
 		)
         val query = "lap"
 		coEvery {
             repository.local.getProducts(query)
-		} returns flowOf(listOf(mockResponse))
+		} returns flowOf(listOf(mockProduct))
 
         viewModel.getSavedProducts(query)
 
-		assertEquals(
-            mockResponse.category,
-			viewModel.productsSavedResponseState.value.data?.get(0)?.category
-		)
+		viewModel.productsSavedResponseState.test {
+			awaitItem() // Consume the initial Loading state
+			val result = awaitItem() // Consume the success state
+			assertEquals(
+				mockProduct.category,
+				result.data?.get(0)?.category
+			)
+			cancelAndIgnoreRemainingEvents()
+		}
 	}
 
 	@Test
-    fun getSavedProductShouldEmitSuccess() = runTest {
+	fun getSavedProduct() = runTest {
 		val mockResponse = Product(
             1, "", "", 0.0, 0.0, 0.0, 0, "", "laptops", "", listOf()
 		)
@@ -118,11 +121,16 @@ class ProductViewModelTest {
 
 		viewModel.getSavedProduct(1)
 
-		assertEquals(mockResponse.id, viewModel.productSavedResponseState.value.data?.id)
+		viewModel.productSavedResponseState.test {
+			awaitItem() // Consume the initial Loading state
+			val result = awaitItem() // Consume the success state
+			assertEquals(mockResponse.id, result.data?.id)
+			cancelAndIgnoreRemainingEvents()
+		}
 	}
 
 	@Test
-    fun saveShouldEmitSuccess() = runTest {
+	fun save() = runTest {
 		val mockRequest = Product(
             1, "", "", 0.0, 0.0, 0.0, 0, "", "laptops", "", listOf()
 		)
@@ -132,14 +140,19 @@ class ProductViewModelTest {
 
 		viewModel.save(mockRequest)
 
-        assertEquals(
-            ResponseState.Success(mockRequest).data,
-            viewModel.productSavedState.value.data
-        )
+		viewModel.productSavedState.test {
+			awaitItem() // Consume the initial Loading state
+			val result = awaitItem() // Consume the success state
+			assertEquals(
+				mockRequest.id,
+				result.data?.id
+			)
+			cancelAndIgnoreRemainingEvents()
+		}
 	}
 
 	@Test
-    fun removeShouldEmitSuccess() = runTest {
+	fun remove() = runTest {
 		val mockRequest = Product(
             1, "", "", 0.0, 0.0, 0.0, 0, "", "laptops", "", listOf()
 		)
@@ -149,9 +162,14 @@ class ProductViewModelTest {
 
 		viewModel.remove(mockRequest)
 
-        assertEquals(
-            ResponseState.Success(mockRequest).data,
-            viewModel.productSavedState.value.data
-        )
+		viewModel.productSavedState.test {
+			awaitItem() // Consume the initial Loading state
+			val result = awaitItem() // Consume the success state
+			assertEquals(
+				mockRequest.id,
+				result.data?.id
+			)
+			cancelAndIgnoreRemainingEvents()
+		}
 	}
 }
