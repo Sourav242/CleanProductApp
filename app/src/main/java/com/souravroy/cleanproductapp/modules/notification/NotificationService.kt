@@ -7,11 +7,14 @@ import com.google.firebase.messaging.RemoteMessage
 const val TAG = "Notification"
 
 class NotificationService : FirebaseMessagingService() {
+    companion object {
+        const val CHANNEL_ID = "ProductChannelID"
+    }
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
         // TODO: Implement token handling logic here.
-        Log.d(TAG, "Refreshed token: $token")
+        Log.d(TAG, "FCM token: $token")
     }
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
